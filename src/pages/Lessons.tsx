@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -50,6 +51,86 @@ const Lessons = () => {
             "Real estate assets"
           ],
           correctAnswer: "Monthly income"
+        },
+        {
+          title: "How often should you review and adjust your budget?",
+          options: [
+            "Once a year",
+            "Monthly",
+            "Never",
+            "Only when having financial problems"
+          ],
+          correctAnswer: "Monthly"
+        },
+        {
+          title: "What is a zero-based budget?",
+          options: [
+            "A budget where you spend everything you earn",
+            "A budget where every dollar has a purpose",
+            "A budget with no savings",
+            "A budget starting from zero"
+          ],
+          correctAnswer: "A budget where every dollar has a purpose"
+        },
+        {
+          title: "What should be your first step in creating a budget?",
+          options: [
+            "Calculate your total income",
+            "List your expenses",
+            "Set financial goals",
+            "Start saving money"
+          ],
+          correctAnswer: "Calculate your total income"
+        },
+        {
+          title: "What is the 50/30/20 budgeting rule?",
+          options: [
+            "50% savings, 30% needs, 20% wants",
+            "50% needs, 30% wants, 20% savings",
+            "50% needs, 30% savings, 20% wants",
+            "50% wants, 30% needs, 20% savings"
+          ],
+          correctAnswer: "50% needs, 30% wants, 20% savings"
+        },
+        {
+          title: "Which category is typically the largest expense in a household budget?",
+          options: [
+            "Food",
+            "Housing",
+            "Entertainment",
+            "Transportation"
+          ],
+          correctAnswer: "Housing"
+        },
+        {
+          title: "What is an emergency fund?",
+          options: [
+            "Money set aside for vacations",
+            "Savings for large purchases",
+            "Money for unexpected expenses",
+            "Investment in stocks"
+          ],
+          correctAnswer: "Money for unexpected expenses"
+        },
+        {
+          title: "How many months of expenses should an emergency fund ideally cover?",
+          options: [
+            "1-2 months",
+            "3-6 months",
+            "7-9 months",
+            "10-12 months"
+          ],
+          correctAnswer: "3-6 months"
+        },
+        {
+          title: "What is discretionary income?",
+          options: [
+            "Total monthly income",
+            "Money left after paying taxes",
+            "Money left after paying essential expenses",
+            "Money spent on necessities"
+          ],
+          correctAnswer: "Money left after paying essential expenses"
         }
       ]
     },
@@ -62,24 +143,104 @@ const Lessons = () => {
       isCompleted: false,
       questions: [
         {
-          title: "What is the difference between a savings account and a checking account?",
+          title: "What is compound interest?",
           options: [
-            "Savings accounts offer higher interest rates",
-            "Checking accounts are more flexible for daily transactions",
-            "Savings accounts are only for short-term investments",
-            "Checking accounts offer better security"
+            "Interest earned only on the principal amount",
+            "Interest earned on both principal and accumulated interest",
+            "A fixed interest rate that never changes",
+            "Interest paid to creditors"
           ],
-          correctAnswer: "Checking accounts are more flexible for daily transactions"
+          correctAnswer: "Interest earned on both principal and accumulated interest"
+        },
+        {
+          title: "Which saving strategy is best for short-term goals?",
+          options: [
+            "High-yield savings account",
+            "Long-term investment in stocks",
+            "Real estate investment",
+            "Retirement account"
+          ],
+          correctAnswer: "High-yield savings account"
+        },
+        {
+          title: "What is the pay yourself first strategy?",
+          options: [
+            "Spending money on yourself before bills",
+            "Saving before spending on expenses",
+            "Paying bills before saving",
+            "Investing in yourself through education"
+          ],
+          correctAnswer: "Saving before spending on expenses"
+        },
+        {
+          title: "What is a good percentage of income to save each month?",
+          options: [
+            "5% or less",
+            "10-15%",
+            "20% or more",
+            "50% or more"
+          ],
+          correctAnswer: "20% or more"
+        },
+        {
+          title: "What is dollar-cost averaging?",
+          options: [
+            "Investing a fixed amount regularly regardless of price",
+            "Buying when prices are low",
+            "Selling when prices are high",
+            "Converting dollars to other currencies"
+          ],
+          correctAnswer: "Investing a fixed amount regularly regardless of price"
+        },
+        {
+          title: "Which account typically offers the highest interest rate?",
+          options: [
+            "Checking account",
+            "Traditional savings account",
+            "Certificate of Deposit (CD)",
+            "Money market account"
+          ],
+          correctAnswer: "Certificate of Deposit (CD)"
         },
         {
           title: "What is the rule of 72?",
           options: [
-            "It is a formula to calculate the number of years it takes to double an investment",
-            "It is a rule to calculate the number of years it takes to triple an investment",
-            "It is a rule to calculate the number of years it takes to quadruple an investment",
-            "It is a rule to calculate the number of years it takes to quintuple an investment"
+            "A formula to calculate monthly savings",
+            "Years needed to double money at a given interest rate",
+            "Percentage of income to save",
+            "Number of months to reach a savings goal"
           ],
-          correctAnswer: "It is a formula to calculate the number of years it takes to double an investment"
+          correctAnswer: "Years needed to double money at a given interest rate"
+        },
+        {
+          title: "What is a common barrier to saving money?",
+          options: [
+            "Having too much income",
+            "Lifestyle inflation",
+            "Low interest rates",
+            "Having a budget"
+          ],
+          correctAnswer: "Lifestyle inflation"
+        },
+        {
+          title: "What is the purpose of an emergency fund?",
+          options: [
+            "To earn high returns",
+            "To protect against unexpected expenses",
+            "To save for retirement",
+            "To invest in stocks"
+          ],
+          correctAnswer: "To protect against unexpected expenses"
+        },
+        {
+          title: "Which is a characteristic of a good savings goal?",
+          options: [
+            "Vague and flexible",
+            "Specific and measurable",
+            "Quick and easy",
+            "Complex and challenging"
+          ],
+          correctAnswer: "Specific and measurable"
         }
       ]
     },
@@ -92,24 +253,104 @@ const Lessons = () => {
       isCompleted: false,
       questions: [
         {
-          title: "What is the difference between stocks and bonds?",
+          title: "What is diversification in investing?",
           options: [
-            "Stocks are traded on the stock market and provide the potential for higher returns",
-            "Bonds are issued by governments and corporations and provide a fixed income",
-            "Stocks are issued by governments and corporations and provide a fixed income",
-            "Bonds are traded on the stock market and provide the potential for higher returns"
+            "Investing all money in one stock",
+            "Spreading investments across different assets",
+            "Only investing in safe options",
+            "Investing in cryptocurrency only"
           ],
-          correctAnswer: "Stocks are traded on the stock market and provide the potential for higher returns"
+          correctAnswer: "Spreading investments across different assets"
         },
         {
-          title: "What is the difference between a mutual fund and a stock?",
+          title: "What is a stock?",
           options: [
-            "Mutual funds are a collection of stocks, while stocks are individual shares",
-            "Mutual funds are a collection of bonds, while stocks are individual shares",
-            "Mutual funds are a collection of stocks, while bonds are individual shares",
-            "Mutual funds are a collection of bonds, while stocks are individual shares"
+            "A loan to a company",
+            "Ownership share in a company",
+            "A government bond",
+            "A savings account"
           ],
-          correctAnswer: "Mutual funds are a collection of stocks, while stocks are individual shares"
+          correctAnswer: "Ownership share in a company"
+        },
+        {
+          title: "What is a bond?",
+          options: [
+            "A type of stock",
+            "A loan to a government or company",
+            "A savings account",
+            "A cryptocurrency"
+          ],
+          correctAnswer: "A loan to a government or company"
+        },
+        {
+          title: "What is an ETF?",
+          options: [
+            "A single stock",
+            "A bundle of investments that trades like a stock",
+            "A type of savings account",
+            "A government bond"
+          ],
+          correctAnswer: "A bundle of investments that trades like a stock"
+        },
+        {
+          title: "What is the main advantage of a mutual fund?",
+          options: [
+            "Guaranteed returns",
+            "Professional management",
+            "No risk",
+            "Higher returns than stocks"
+          ],
+          correctAnswer: "Professional management"
+        },
+        {
+          title: "What is asset allocation?",
+          options: [
+            "Putting all money in stocks",
+            "Dividing investments among different asset types",
+            "Only investing in bonds",
+            "Keeping all money in cash"
+          ],
+          correctAnswer: "Dividing investments among different asset types"
+        },
+        {
+          title: "What is market capitalization?",
+          options: [
+            "The total value of a company's shares",
+            "The price of one share",
+            "The company's profit",
+            "The company's debt"
+          ],
+          correctAnswer: "The total value of a company's shares"
+        },
+        {
+          title: "What is a dividend?",
+          options: [
+            "A type of stock",
+            "A payment to shareholders",
+            "A type of bond",
+            "A market index"
+          ],
+          correctAnswer: "A payment to shareholders"
+        },
+        {
+          title: "What is the S&P 500?",
+          options: [
+            "A single company's stock",
+            "An index of 500 large US companies",
+            "A type of bond",
+            "A mutual fund"
+          ],
+          correctAnswer: "An index of 500 large US companies"
+        },
+        {
+          title: "What is the primary benefit of long-term investing?",
+          options: [
+            "Quick profits",
+            "Compound growth over time",
+            "No risk",
+            "Guaranteed returns"
+          ],
+          correctAnswer: "Compound growth over time"
         }
       ]
     },
@@ -122,24 +363,104 @@ const Lessons = () => {
       isCompleted: false,
       questions: [
         {
-          title: "What is the difference between a bull market and a bear market?",
+          title: "What is a bull market?",
           options: [
-            "A bull market is when the stock market is rising, while a bear market is when the stock market is falling",
-            "A bull market is when the stock market is falling, while a bear market is when the stock market is rising",
-            "A bull market is when the stock market is rising, while a bear market is when the stock market is stable",
-            "A bull market is when the stock market is stable, while a bear market is when the stock market is falling"
+            "Market is trending down",
+            "Market is trending up",
+            "Market is stable",
+            "Market is closed"
           ],
-          correctAnswer: "A bull market is when the stock market is rising, while a bear market is when the stock market is falling"
+          correctAnswer: "Market is trending up"
         },
         {
-          title: "What is the difference between a primary market and a secondary market?",
+          title: "What is a bear market?",
           options: [
-            "A primary market is when a company issues new shares, while a secondary market is when existing shares are traded",
-            "A primary market is when existing shares are traded, while a secondary market is when a company issues new shares",
-            "A primary market is when a company issues new bonds, while a secondary market is when existing bonds are traded",
-            "A primary market is when existing bonds are traded, while a secondary market is when a company issues new bonds"
+            "Market is trending up",
+            "Market is trending down",
+            "Market is stable",
+            "Market is volatile"
           ],
-          correctAnswer: "A primary market is when a company issues new shares, while a secondary market is when existing shares are traded"
+          correctAnswer: "Market is trending down"
+        },
+        {
+          title: "What is volatility in the stock market?",
+          options: [
+            "Steady price movements",
+            "No price changes",
+            "Rapid and significant price changes",
+            "Gradual price increases"
+          ],
+          correctAnswer: "Rapid and significant price changes"
+        },
+        {
+          title: "What is a P/E ratio?",
+          options: [
+            "Price divided by earnings",
+            "Profit divided by expenses",
+            "Price divided by equity",
+            "Profit divided by equity"
+          ],
+          correctAnswer: "Price divided by earnings"
+        },
+        {
+          title: "What is market order?",
+          options: [
+            "Buy/sell at a specific price",
+            "Buy/sell at the current market price",
+            "Buy/sell at a future date",
+            "Buy/sell with conditions"
+          ],
+          correctAnswer: "Buy/sell at the current market price"
+        },
+        {
+          title: "What is a limit order?",
+          options: [
+            "Buy/sell at market price",
+            "Buy/sell at a specific price or better",
+            "Buy/sell at any price",
+            "Buy/sell at closing price"
+          ],
+          correctAnswer: "Buy/sell at a specific price or better"
+        },
+        {
+          title: "What is a blue-chip stock?",
+          options: [
+            "New company stock",
+            "High-risk stock",
+            "Established, financially sound company stock",
+            "Penny stock"
+          ],
+          correctAnswer: "Established, financially sound company stock"
+        },
+        {
+          title: "What is a stock split?",
+          options: [
+            "Company dividing existing shares into multiple shares",
+            "Company buying back shares",
+            "Company issuing new shares",
+            "Company merging shares"
+          ],
+          correctAnswer: "Company dividing existing shares into multiple shares"
+        },
+        {
+          title: "What is market capitalization?",
+          options: [
+            "Company's debt",
+            "Company's revenue",
+            "Total value of company's outstanding shares",
+            "Company's profit"
+          ],
+          correctAnswer: "Total value of company's outstanding shares"
+        },
+        {
+          title: "What is insider trading?",
+          options: [
+            "Trading during market hours",
+            "Trading based on public information",
+            "Trading based on non-public information",
+            "Trading with a broker"
+          ],
+          correctAnswer: "Trading based on non-public information"
         }
       ]
     },
@@ -155,14 +476,23 @@ const Lessons = () => {
 
   const handleQuizComplete = (isCorrect: boolean) => {
     if (isCorrect) {
-      const lesson = lessons.find(l => l.id === activeQuiz);
-      if (lesson && !lesson.isCompleted) {
-        setTotalXP(prev => prev + lesson.xp);
-        setLessons(prevLessons =>
-          prevLessons.map(l =>
-            l.id === activeQuiz ? { ...l, isCompleted: true } : l
-          )
-        );
+      // Move to next question if available
+      const activeLesson = lessons.find(l => l.id === activeQuiz);
+      if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
+      } else {
+        // If it's the last question and correct, mark lesson as complete
+        if (!activeLesson?.isCompleted) {
+          setTotalXP(prev => prev + (activeLesson?.xp || 0));
+          setLessons(prevLessons =>
+            prevLessons.map(l =>
+              l.id === activeQuiz ? { ...l, isCompleted: true } : l
+            )
+          );
+        }
+        // Reset quiz state
+        setActiveQuiz(null);
+        setCurrentQuestionIndex(0);
       }
     }
   };
@@ -183,6 +513,8 @@ const Lessons = () => {
             question={currentQuestion}
             onComplete={handleQuizComplete}
             onClose={handleQuizClose}
+            currentQuestion={currentQuestionIndex + 1}
+            totalQuestions={activeLesson?.questions?.length || 0}
           />
         ) : (
           <>

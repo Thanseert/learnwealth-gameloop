@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -13,15 +13,31 @@ interface QuizProps {
   };
   onComplete: (isCorrect: boolean) => void;
   onClose: () => void;
+  currentQuestion: number;
+  totalQuestions: number;
 }
 
-export function Quiz({ question, onComplete, onClose }: QuizProps) {
+export function Quiz({ question, onComplete, onClose, currentQuestion, totalQuestions }: QuizProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const isCorrect = selectedAnswer === question.correctAnswer;
 
+  // Create audio elements
+  useEffect(() => {
+    const correctAudio = new Audio("/correct.mp3");
+    const wrongAudio = new Audio("/wrong.mp3");
+    
+    return () => {
+      correctAudio.pause();
+      wrongAudio.pause();
+    };
+  }, []);
+
   const handleCheck = () => {
     setHasSubmitted(true);
+    // Play sound based on answer
+    const audio = new Audio(isCorrect ? "/correct.mp3" : "/wrong.mp3");
+    audio.play();
     onComplete(isCorrect);
   };
 
@@ -29,7 +45,15 @@ export function Quiz({ question, onComplete, onClose }: QuizProps) {
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg animate-fade-in">
       {/* Progress Bar */}
       <div className="w-full h-2 bg-gray-200 rounded-full mb-8">
-        <div className="h-full bg-green-500 rounded-full w-1/3" />
+        <div 
+          className="h-full bg-green-500 rounded-full transition-all duration-300"
+          style={{ width: `${(currentQuestion / totalQuestions) * 100}%` }}
+        />
+      </div>
+
+      {/* Question Counter */}
+      <div className="text-sm text-gray-500 mb-4">
+        Question {currentQuestion} of {totalQuestions}
       </div>
 
       {/* Question */}
@@ -66,14 +90,8 @@ export function Quiz({ question, onComplete, onClose }: QuizProps) {
         ))}
       </RadioGroup>
 
-      {/* Action Buttons */}
-      <div className="flex justify-end space-x-4">
-        <Button
-          variant="outline"
-          onClick={onClose}
-        >
-          Skip
-        </Button>
+      {/* Action Button */}
+      <div className="flex justify-end">
         <Button
           onClick={handleCheck}
           disabled={!selectedAnswer || hasSubmitted}
