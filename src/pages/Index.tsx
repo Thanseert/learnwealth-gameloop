@@ -1,8 +1,11 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -32,6 +35,7 @@ const Index = () => {
         <Button
           size="lg"
           className="bg-primary hover:bg-primary-hover text-white px-8 py-6 text-lg rounded-full"
+          onClick={() => navigate('/lessons')}
         >
           Start Learning
           <ArrowRight className="ml-2 h-5 w-5" />
