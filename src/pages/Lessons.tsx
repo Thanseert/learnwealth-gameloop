@@ -476,14 +476,16 @@ const Lessons = () => {
 
   const handleQuizComplete = (isCorrect: boolean) => {
     if (isCorrect) {
+      // Award 5XP for each correct answer
+      setTotalXP(prev => prev + 5);
+      
       // Move to next question if available
       const activeLesson = lessons.find(l => l.id === activeQuiz);
       if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
-        // If it's the last question and correct, mark lesson as complete
+        // If it's the last question, mark lesson as complete
         if (!activeLesson?.isCompleted) {
-          setTotalXP(prev => prev + (activeLesson?.xp || 0));
           setLessons(prevLessons =>
             prevLessons.map(l =>
               l.id === activeQuiz ? { ...l, isCompleted: true } : l
