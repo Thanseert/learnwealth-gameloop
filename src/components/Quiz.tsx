@@ -38,7 +38,12 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     // Play sound based on answer
     const audio = new Audio(isCorrect ? "/correct.mp3" : "/wrong.mp3");
     audio.play();
+  };
+
+  const handleNext = () => {
     onComplete(isCorrect);
+    setHasSubmitted(false);
+    setSelectedAnswer("");
   };
 
   return (
@@ -90,15 +95,31 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
         ))}
       </RadioGroup>
 
-      {/* Action Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleCheck}
-          disabled={!selectedAnswer || hasSubmitted}
-          className="px-8"
-        >
-          Check
-        </Button>
+      {/* Action Buttons */}
+      <div className="flex justify-end space-x-4">
+        {!hasSubmitted ? (
+          <Button
+            onClick={handleCheck}
+            disabled={!selectedAnswer}
+            className="px-8"
+          >
+            Check
+          </Button>
+        ) : (
+          <Button
+            onClick={handleNext}
+            className={cn(
+              "px-8",
+              isCorrect ? "bg-green-500 hover:bg-green-600" : "bg-blue-500 hover:bg-blue-600"
+            )}
+          >
+            {isCorrect ? (
+              currentQuestion === totalQuestions ? "Complete" : "Next Question"
+            ) : (
+              "Try Again"
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Feedback Message */}
