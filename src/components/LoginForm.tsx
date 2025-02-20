@@ -37,7 +37,7 @@ export function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50 p-4">
-      <Card className="w-full max-w-md border-none shadow-xl bg-white/80 backdrop-blur-sm">
+      <Card className="w-full max-w-md border-none shadow-xl bg-white/80 backdrop-blur-sm relative">
         <CardHeader className="space-y-2 text-center">
           <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
             <svg
@@ -107,7 +107,7 @@ export function LoginForm() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <Label htmlFor="timeCommitment" className="text-gray-700">Daily Time Commitment</Label>
               <Select
                 value={formData.timeCommitment}
@@ -118,7 +118,7 @@ export function LoginForm() {
                 <SelectTrigger className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20">
                   <SelectValue placeholder="How much time can you dedicate?" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={5}>
                   <SelectItem value="2-5">2-5 minutes</SelectItem>
                   <SelectItem value="5-10">5-10 minutes</SelectItem>
                   <SelectItem value="10-15">10-15 minutes</SelectItem>
@@ -127,7 +127,7 @@ export function LoginForm() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 relative">
               <Label htmlFor="level" className="text-gray-700">Experience Level</Label>
               <Select
                 value={formData.level}
@@ -138,7 +138,7 @@ export function LoginForm() {
                 <SelectTrigger className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20">
                   <SelectValue placeholder="What's your current knowledge level?" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={5}>
                   <SelectItem value="beginner">Beginner</SelectItem>
                   <SelectItem value="intermediate">Intermediate</SelectItem>
                   <SelectItem value="pro">Pro</SelectItem>
