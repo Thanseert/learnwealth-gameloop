@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Trophy, Coins } from "lucide-react";
 import { Quiz } from "@/components/Quiz";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Lesson {
   id: number;
@@ -20,6 +21,7 @@ interface Lesson {
 }
 
 const Lessons = () => {
+  const navigate = useNavigate();
   const [totalXP, setTotalXP] = useState(0);
   const [activeQuiz, setActiveQuiz] = useState<number | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -465,6 +467,14 @@ const Lessons = () => {
       ]
     },
   ]);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const userData = localStorage.getItem("userData");
+    if (!userData) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleLessonClick = (lessonId: number) => {
     const lesson = lessons.find(l => l.id === lessonId);
