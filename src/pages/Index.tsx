@@ -1,8 +1,9 @@
 
+import { useState } from "react";
 import { LoginForm } from "@/components/LoginForm";
 
 const Index = () => {
-  // Check if user is already logged in
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const userData = localStorage.getItem("userData");
 
   if (userData) {
@@ -28,8 +29,30 @@ const Index = () => {
     );
   }
 
-  // If user is not logged in, show the login form
-  return <LoginForm />;
+  if (showLoginForm) {
+    return <LoginForm />;
+  }
+
+  // Landing page
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="container max-w-6xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+          Master Your <span className="text-primary">Financial Future</span>
+        </h1>
+        <p className="text-gray-600 text-lg sm:text-xl max-w-3xl mx-auto mb-12">
+          Learn essential financial skills through interactive lessons and quizzes.
+          Start your journey to financial literacy today.
+        </p>
+        <button
+          onClick={() => setShowLoginForm(true)}
+          className="inline-flex items-center justify-center gap-2 px-8 py-3 text-lg font-medium text-white bg-primary hover:bg-primary/90 rounded-full"
+        >
+          Start Learning
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default Index;
