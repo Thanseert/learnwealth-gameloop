@@ -31,25 +31,40 @@ export function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Store user data in localStorage
     localStorage.setItem("userData", JSON.stringify(formData));
-    // Navigate to lessons page
     navigate("/lessons");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome to Financial Education</CardTitle>
-          <CardDescription>
-            Please fill in your details to start your learning journey
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-50 p-4">
+      <Card className="w-full max-w-md border-none shadow-xl bg-white/80 backdrop-blur-sm">
+        <CardHeader className="space-y-2 text-center">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Start Your Learning Journey
+          </CardTitle>
+          <CardDescription className="text-gray-600">
+            Join our community of financial learners and begin your path to financial literacy
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name" className="text-gray-700">Full Name</Label>
               <Input
                 id="name"
                 placeholder="John Doe"
@@ -58,11 +73,12 @@ export function LoginForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
+                className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -72,11 +88,12 @@ export function LoginForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
+                className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="text-gray-700">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -86,19 +103,20 @@ export function LoginForm() {
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
+                className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="timeCommitment">Daily Time Commitment</Label>
+              <Label htmlFor="timeCommitment" className="text-gray-700">Daily Time Commitment</Label>
               <Select
                 value={formData.timeCommitment}
                 onValueChange={(value) =>
                   setFormData({ ...formData, timeCommitment: value })
                 }
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select time commitment" />
+                <SelectTrigger className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                  <SelectValue placeholder="How much time can you dedicate?" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="2-5">2-5 minutes</SelectItem>
@@ -110,15 +128,15 @@ export function LoginForm() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="level">Experience Level</Label>
+              <Label htmlFor="level" className="text-gray-700">Experience Level</Label>
               <Select
                 value={formData.level}
                 onValueChange={(value) =>
                   setFormData({ ...formData, level: value })
                 }
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select your level" />
+                <SelectTrigger className="w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                  <SelectValue placeholder="What's your current knowledge level?" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="beginner">Beginner</SelectItem>
@@ -128,8 +146,11 @@ export function LoginForm() {
               </Select>
             </div>
 
-            <Button type="submit" className="w-full">
-              Start Learning
+            <Button 
+              type="submit" 
+              className="w-full bg-primary hover:bg-primary/90 text-white transition-all duration-200 py-6"
+            >
+              Begin Your Journey
             </Button>
           </form>
         </CardContent>
