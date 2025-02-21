@@ -38,8 +38,8 @@ export function LessonCard({
         >
           {number}
         </div>
-        {/* Vertical line connecting to next lesson */}
-        <div className="w-1 h-24 bg-gray-200 absolute top-14 left-1/2 -translate-x-1/2 -z-10" />
+        {/* Vertical line connecting to next lesson - made thicker and more visible */}
+        <div className="w-1 h-32 bg-gray-200 absolute top-12 left-1/2 -translate-x-1/2 -z-10" />
       </div>
       
       <Card
