@@ -26,26 +26,26 @@ export function LessonCard({
   isLocked = false,
 }: LessonCardProps) {
   return (
-    <div className="flex items-start gap-6 relative animate-fade-in">
+    <div className="flex items-start gap-8 relative animate-fade-in">
       <div className="flex flex-col items-center">
-        {/* Circle with border and gradient */}
+        {/* Larger circle with stronger gradient and shadow */}
         <div
           className={cn(
-            "w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold relative",
+            "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold shadow-lg relative",
             isCompleted 
-              ? "bg-gradient-to-br from-primary/20 to-primary/10 text-primary border-4 border-primary" 
-              : "bg-gradient-to-br from-gray-100 to-gray-50 text-gray-400 border-4 border-gray-200"
+              ? "bg-gradient-to-br from-primary/30 to-primary text-white border-[6px] border-primary" 
+              : "bg-gradient-to-br from-gray-200 to-gray-300 text-gray-600 border-[6px] border-gray-300"
           )}
         >
           {number}
         </div>
-        {/* Thicker vertical connecting line with gradient */}
+        {/* Thicker line with stronger gradient */}
         <div 
           className={cn(
-            "w-1.5 h-48 absolute top-16 left-1/2 -translate-x-1/2 -z-10",
+            "w-2 h-56 absolute top-20 left-1/2 -translate-x-1/2 -z-10 rounded-full",
             isCompleted 
-              ? "bg-gradient-to-b from-primary/30 to-primary/10" 
-              : "bg-gradient-to-b from-gray-200 to-gray-100"
+              ? "bg-gradient-to-b from-primary via-primary/50 to-primary/20" 
+              : "bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100"
           )}
         />
       </div>
@@ -54,8 +54,8 @@ export function LessonCard({
         className={cn(
           "flex-1 transition-all duration-300 border-2",
           isLocked 
-            ? "opacity-75 border-gray-100" 
-            : "hover:-translate-y-1 hover:shadow-lg cursor-pointer border-gray-100 hover:border-primary/20",
+            ? "opacity-75 border-gray-200" 
+            : "hover:-translate-y-1 hover:shadow-xl cursor-pointer border-gray-200 hover:border-primary",
           "animate-scale-in"
         )}
         onClick={!isLocked ? onClick : undefined}
@@ -80,11 +80,11 @@ export function LessonCard({
               <Progress value={progress} className="h-2" />
               <div className="flex justify-between text-sm text-gray-500">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-primary/30" />
+                  <div className="w-3 h-3 rounded-full bg-primary/30" />
                   <span>{Math.round(progress * 0.1)}/10 Questions</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-primary/30" />
+                  <div className="w-3 h-3 rounded-full bg-primary/30" />
                   <span>{Math.round(progress * 0.15)}/15 Practice</span>
                 </div>
               </div>
