@@ -14,6 +14,7 @@ interface LessonCardProps {
   number: number;
   progress?: number;
   isLocked?: boolean;
+  isLast?: boolean; // Add new prop to identify last item
 }
 
 export function LessonCard({
@@ -24,6 +25,7 @@ export function LessonCard({
   number,
   progress = 0,
   isLocked = false,
+  isLast = false, // Default to false
 }: LessonCardProps) {
   return (
     <div className="flex items-start gap-8 relative animate-fade-in">
@@ -39,15 +41,17 @@ export function LessonCard({
         >
           {number}
         </div>
-        {/* Custom thin vertical line */}
-        <div 
-          className={cn(
-            "w-[2px] h-[160px] absolute top-[60px] left-1/2 -translate-x-1/2 -z-10",
-            isCompleted 
-              ? "bg-[#8b5cf6]/20" 
-              : "bg-[#e2e8f0]"
-          )}
-        />
+        {/* Custom thin vertical line - only show if not last item */}
+        {!isLast && (
+          <div 
+            className={cn(
+              "w-[2px] h-[160px] absolute top-[60px] left-1/2 -translate-x-1/2 -z-10",
+              isCompleted 
+                ? "bg-[#8b5cf6]/20" 
+                : "bg-[#e2e8f0]"
+            )}
+          />
+        )}
       </div>
       
       <Card

@@ -580,6 +580,7 @@ const Lessons = () => {
                   number={index + 1}
                   progress={lesson.isCompleted ? 100 : (lesson.progress || 0)}
                   isLocked={index > 0 && !lessons[index - 1].isCompleted}
+                  isLast={index === lessons.length - 1} // Add this line
                 />
               ))}
             </div>
