@@ -28,24 +28,24 @@ export function LessonCard({
   return (
     <div className="flex items-start gap-8 relative animate-fade-in">
       <div className="flex flex-col items-center">
-        {/* Square with rounded corners for numbers */}
+        {/* Square with custom rounded corners for numbers */}
         <div
           className={cn(
-            "w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-semibold shadow-md relative",
+            "w-[60px] h-[60px] rounded-[16px] flex items-center justify-center text-2xl font-semibold relative",
             isCompleted 
-              ? "bg-primary text-white" 
-              : "bg-primary/10 text-primary"
+              ? "bg-[#8b5cf6] text-white" 
+              : "bg-[#f1f5f9] text-[#8b5cf6]"
           )}
         >
           {number}
         </div>
-        {/* Thin vertical line */}
+        {/* Custom thin vertical line */}
         <div 
           className={cn(
-            "w-[2px] h-40 absolute top-16 left-1/2 -translate-x-1/2 -z-10",
+            "w-[2px] h-[160px] absolute top-[60px] left-1/2 -translate-x-1/2 -z-10",
             isCompleted 
-              ? "bg-primary/20" 
-              : "bg-gray-200"
+              ? "bg-[#8b5cf6]/20" 
+              : "bg-[#e2e8f0]"
           )}
         />
       </div>
@@ -56,18 +56,18 @@ export function LessonCard({
           isLocked 
             ? "opacity-75" 
             : "hover:-translate-y-1 hover:shadow-lg cursor-pointer",
-          "animate-scale-in bg-white"
+          "animate-scale-in bg-white border-[#e2e8f0]"
         )}
         onClick={!isLocked ? onClick : undefined}
       >
         <div className="p-6 space-y-4">
           <div className="flex items-start justify-between">
             <div className="space-y-2">
-              <h3 className="font-semibold text-xl text-gray-900">{title}</h3>
-              <p className="text-base text-gray-600 leading-relaxed">{description}</p>
+              <h3 className="font-semibold text-xl text-[#1e293b]">{title}</h3>
+              <p className="text-base text-[#64748b] leading-relaxed">{description}</p>
             </div>
             {isLocked && (
-              <Lock className="w-5 h-5 text-gray-400 shrink-0 ml-4" />
+              <Lock className="w-5 h-5 text-[#94a3b8] shrink-0 ml-4" />
             )}
           </div>
           
@@ -75,9 +75,9 @@ export function LessonCard({
             <div className="space-y-4">
               <Progress 
                 value={progress} 
-                className="h-2 bg-gray-100" 
+                className="h-2 bg-[#f1f5f9]" 
               />
-              <div className="flex items-center justify-start gap-6 text-sm text-gray-600">
+              <div className="flex items-center justify-start gap-6 text-sm text-[#64748b]">
                 <span>{Math.round(progress * 0.15)}/15 Lessons</span>
                 <span>{Math.round(progress * 0.1)}/10 Practice</span>
               </div>
