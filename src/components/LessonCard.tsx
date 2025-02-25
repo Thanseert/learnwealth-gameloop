@@ -14,7 +14,7 @@ interface LessonCardProps {
   number: number;
   progress?: number;
   isLocked?: boolean;
-  isLast?: boolean; // Add new prop to identify last item
+  isLast?: boolean;
 }
 
 export function LessonCard({
@@ -25,7 +25,7 @@ export function LessonCard({
   number,
   progress = 0,
   isLocked = false,
-  isLast = false, // Default to false
+  isLast = false,
 }: LessonCardProps) {
   return (
     <div className="flex items-start gap-8 relative animate-fade-in">
@@ -35,8 +35,8 @@ export function LessonCard({
           className={cn(
             "w-[60px] h-[60px] rounded-[16px] flex items-center justify-center text-2xl font-semibold relative",
             isCompleted 
-              ? "bg-[#8b5cf6] text-white" 
-              : "bg-[#f1f5f9] text-[#8b5cf6]"
+              ? "bg-[#9b87f5] text-white" 
+              : "bg-[#9b87f5] text-white"
           )}
         >
           {number}
@@ -47,7 +47,7 @@ export function LessonCard({
             className={cn(
               "w-[2px] h-[160px] absolute top-[60px] left-1/2 -translate-x-1/2 -z-10",
               isCompleted 
-                ? "bg-[#8b5cf6]/20" 
+                ? "bg-[#9b87f5]/20" 
                 : "bg-[#e2e8f0]"
             )}
           />
