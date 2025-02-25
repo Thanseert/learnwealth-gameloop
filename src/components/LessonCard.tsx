@@ -43,7 +43,7 @@ export function LessonCard({
         {!isLast && (
           <div 
             className={cn(
-              "w-[1px] h-[160px] absolute top-[60px] left-1/2 -translate-x-1/2 -z-10",
+              "w-[0.5px] h-[160px] absolute top-[60px] left-1/2 -translate-x-1/2 -z-10",
               "bg-[#e2e8f0]"
             )}
           />
