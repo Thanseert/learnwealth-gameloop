@@ -32,11 +32,9 @@ export function LessonCard({
       <div className="flex flex-col items-center">
         {/* Square with custom rounded corners for numbers */}
         <div
+          style={{ backgroundColor: '#9b87f5' }}  // Using inline style to ensure color is applied
           className={cn(
-            "w-[60px] h-[60px] rounded-[16px] flex items-center justify-center text-2xl font-semibold relative",
-            isCompleted 
-              ? "bg-[#9b87f5] text-white" 
-              : "bg-[#9b87f5] text-white"
+            "w-[60px] h-[60px] rounded-[16px] flex items-center justify-center text-2xl font-semibold relative text-white"
           )}
         >
           {number}
