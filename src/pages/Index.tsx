@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { LoginForm } from "@/components/LoginForm";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
@@ -9,20 +8,29 @@ import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [showLoginForm, setShowLoginForm] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        
-        setUserData(profile);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          setUserData(profile);
+          // Store user data in localStorage
+          localStorage.setItem("userData", JSON.stringify(profile));
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        toast.error('Error fetching user data');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -30,13 +38,26 @@ const Index = () => {
   }, []);
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error(error.message);
-    } else {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      // Clear user data from localStorage
+      localStorage.removeItem("userData");
       navigate('/auth');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast.error('Error signing out');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   if (userData) {
     return (
@@ -55,12 +76,12 @@ const Index = () => {
             <p className="text-gray-600 text-lg sm:text-xl max-w-3xl mx-auto">
               Continue your financial education journey
             </p>
-            <a
-              href="/lessons"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3 text-lg font-medium text-white bg-primary hover:bg-primary/90 rounded-full transition-colors"
+            <Button
+              onClick={() => navigate("/lessons")}
+              className="px-8 py-3 text-lg font-medium text-white bg-primary hover:bg-primary/90 rounded-full"
             >
               Continue Learning
-            </a>
+            </Button>
           </div>
         </div>
       </div>
@@ -80,7 +101,7 @@ const Index = () => {
           </p>
           <Button 
             onClick={() => navigate('/auth')}
-            className="px-8 py-6 text-lg font-medium text-white bg-primary hover:bg-primary/90 rounded-full transition-colors"
+            className="px-8 py-6 text-lg font-medium text-white bg-primary hover:bg-primary/90 rounded-full"
           >
             Get Started
           </Button>
