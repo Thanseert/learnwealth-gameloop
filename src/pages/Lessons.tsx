@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface Question {
   id: number;
@@ -74,11 +75,16 @@ const Lessons = () => {
   const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
 
   useEffect(() => {
-    // Check if user is logged in
-    const userData = localStorage.getItem("userData");
-    if (!userData) {
-      navigate("/");
-    }
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please sign in to access lessons');
+        navigate('/auth');
+        return;
+      }
+    };
+
+    checkAuth();
   }, [navigate]);
 
   const handleLessonClick = (lessonId: number) => {
@@ -86,27 +92,26 @@ const Lessons = () => {
     if (lesson?.questions && lesson.questions.length > 0) {
       setActiveQuiz(lessonId);
       setCurrentQuestionIndex(0);
+    } else {
+      toast.error('No questions available for this lesson');
     }
   };
 
   const handleQuizComplete = (isCorrect: boolean) => {
     if (isCorrect) {
-      // Award 5XP for each correct answer
       setTotalXP(prev => prev + 5);
       
-      // Move to next question if available
       const activeLesson = lessons.find(l => l.id === activeQuiz);
       if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
         setCurrentQuestionIndex(prev => prev + 1);
       } else {
-        // If it's the last question, mark lesson as complete
         const updatedLessons = lessons.map(l =>
           l.id === activeQuiz ? { ...l, isCompleted: true } : l
         );
         setCompletedLessons(updatedLessons.filter(l => l.isCompleted));
-        // Reset quiz state
         setActiveQuiz(null);
         setCurrentQuestionIndex(0);
+        toast.success('Lesson completed!');
       }
     }
   };
@@ -140,7 +145,11 @@ const Lessons = () => {
       <div className="container py-8 space-y-8 animate-fade-in max-w-4xl mx-auto">
         {activeQuiz && currentQuestion ? (
           <Quiz
-            question={currentQuestion}
+            question={{
+              title: currentQuestion.title,
+              options: currentQuestion.options,
+              correctAnswer: currentQuestion.correctAnswer
+            }}
             onComplete={handleQuizComplete}
             onClose={handleQuizClose}
             currentQuestion={currentQuestionIndex + 1}
