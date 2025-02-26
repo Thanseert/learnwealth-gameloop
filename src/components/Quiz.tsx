@@ -22,6 +22,12 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const isCorrect = selectedAnswer === question.correctAnswer;
 
+  // Reset selected answer when question changes
+  useEffect(() => {
+    setSelectedAnswer("");
+    setHasSubmitted(false);
+  }, [question]);
+
   // Create audio elements
   useEffect(() => {
     const correctAudio = new Audio("/correct.mp3");
