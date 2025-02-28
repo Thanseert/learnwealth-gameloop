@@ -29,6 +29,11 @@ interface Lesson {
   questions?: Question[];
 }
 
+interface CompletedLesson {
+  lesson_id: number;
+  user_id: string;
+}
+
 const fetchLessonsAndQuestions = async () => {
   // Fetch lessons
   const { data: lessonsData, error: lessonsError } = await supabase
@@ -45,10 +50,25 @@ const fetchLessonsAndQuestions = async () => {
 
   if (questionsError) throw questionsError;
 
-  // Organize questions by lesson
+  // Get completed lessons for current user
+  const { data: { session } } = await supabase.auth.getSession();
+  let completedLessonIds: number[] = [];
+  
+  if (session?.user?.id) {
+    const { data: completedLessonsData } = await supabase
+      .from('completed_lessons')
+      .select('lesson_id')
+      .eq('user_id', session.user.id);
+      
+    if (completedLessonsData) {
+      completedLessonIds = completedLessonsData.map(item => item.lesson_id);
+    }
+  }
+
+  // Organize questions by lesson and mark completed lessons
   const lessons = lessonsData.map((lesson: any) => ({
     ...lesson,
-    isCompleted: false,
+    isCompleted: completedLessonIds.includes(lesson.id),
     questions: questionsData
       .filter((q: any) => q.lesson_id === lesson.id)
       .map((q: any) => ({
@@ -69,7 +89,7 @@ const Lessons = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   
-  const { data: lessons = [], isLoading, error } = useQuery({
+  const { data: lessons = [], isLoading, error, refetch } = useQuery({
     queryKey: ['lessons'],
     queryFn: fetchLessonsAndQuestions
   });
@@ -108,7 +128,12 @@ const Lessons = () => {
     checkAuth();
   }, [navigate]);
 
-  const handleLessonClick = (lessonId: number) => {
+  const handleLessonClick = (lessonId: number, isLocked: boolean) => {
+    if (isLocked) {
+      toast.error('Complete the previous lesson to unlock this one');
+      return;
+    }
+    
     const lesson = lessons.find(l => l.id === lessonId);
     if (lesson?.questions && lesson.questions.length > 0) {
       setActiveQuiz(lessonId);
@@ -121,54 +146,79 @@ const Lessons = () => {
   const handleQuizComplete = async (isCorrect: boolean) => {
     if (isCorrect && userId) {
       try {
-        const earnedXP = 5;
-        const newTotalXP = totalXP + earnedXP;
-        
-        // First get the current XP to avoid race conditions
-        const { data: currentData, error: fetchError } = await supabase
-          .from('profiles')
-          .select('xp')
-          .eq('id', userId)
-          .single();
-          
-        if (fetchError) {
-          console.error('Error fetching current XP:', fetchError);
-          toast.error('Failed to update XP');
-          return;
-        }
-        
-        const currentXP = currentData?.xp || 0;
-        const updatedXP = currentXP + earnedXP;
-        
-        // Update the XP in the database
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ xp: updatedXP })
-          .eq('id', userId);
-          
-        if (updateError) {
-          console.error('Error updating XP:', updateError);
-          toast.error('Failed to update XP');
-          return;
-        }
-        
-        // Update local state
-        setTotalXP(updatedXP);
-        toast.success(`+${earnedXP} XP earned!`);
-        
-        // Handle question progression
         const activeLesson = lessons.find(l => l.id === activeQuiz);
+        if (!activeLesson) return;
+        
+        // Check if this lesson has already been completed
+        const isLessonAlreadyCompleted = activeLesson.isCompleted;
+        
+        // Update question progress regardless of completion status
         if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1);
-        } else {
-          const updatedLessons = lessons.map(l =>
-            l.id === activeQuiz ? { ...l, isCompleted: true } : l
-          );
-          setCompletedLessons(updatedLessons.filter(l => l.isCompleted));
-          setActiveQuiz(null);
-          setCurrentQuestionIndex(0);
-          toast.success('Lesson completed!');
+          return;
         }
+        
+        // Handle lesson completion
+        if (!isLessonAlreadyCompleted) {
+          const earnedXP = activeLesson.xp || 5;
+          
+          // First get the current XP to avoid race conditions
+          const { data: currentData, error: fetchError } = await supabase
+            .from('profiles')
+            .select('xp')
+            .eq('id', userId)
+            .single();
+            
+          if (fetchError) {
+            console.error('Error fetching current XP:', fetchError);
+            toast.error('Failed to update XP');
+            return;
+          }
+          
+          const currentXP = currentData?.xp || 0;
+          const updatedXP = currentXP + earnedXP;
+          
+          // Update the XP in the database
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ xp: updatedXP })
+            .eq('id', userId);
+            
+          if (updateError) {
+            console.error('Error updating XP:', updateError);
+            toast.error('Failed to update XP');
+            return;
+          }
+          
+          // Record this lesson as completed
+          const { error: completionError } = await supabase
+            .from('completed_lessons')
+            .insert({
+              user_id: userId,
+              lesson_id: activeLesson.id,
+              completed_at: new Date().toISOString()
+            });
+            
+          if (completionError) {
+            console.error('Error recording lesson completion:', completionError);
+            toast.error('Failed to record lesson completion');
+            return;
+          }
+          
+          // Update local state
+          setTotalXP(updatedXP);
+          toast.success(`Lesson completed! +${earnedXP} XP earned!`);
+          
+          // Refresh lessons data to update completion status
+          refetch();
+        } else {
+          toast.info('You already completed this lesson (no additional XP earned)');
+        }
+        
+        // Reset quiz state
+        setActiveQuiz(null);
+        setCurrentQuestionIndex(0);
+        
       } catch (err) {
         console.error('Error in quiz completion flow:', err);
         toast.error('Something went wrong. Please try again.');
@@ -266,7 +316,7 @@ const Lessons = () => {
                       xp={lesson.xp}
                       difficulty={lesson.difficulty}
                       isCompleted={lesson.isCompleted}
-                      onClick={() => handleLessonClick(lesson.id)}
+                      onClick={() => handleLessonClick(lesson.id, index > 0 && !lessons[index - 1].isCompleted)}
                       number={index + 1}
                       progress={lesson.isCompleted ? 100 : (lesson.progress || 0)}
                       isLocked={index > 0 && !lessons[index - 1].isCompleted}
