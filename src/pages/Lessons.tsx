@@ -88,14 +88,20 @@ const Lessons = () => {
       setUserId(session.user.id);
       
       // Fetch user XP
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('xp')
         .eq('id', session.user.id)
         .single();
-        
-      if (profile && profile.xp) {
-        setTotalXP(profile.xp);
+      
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        toast.error('Error loading user profile');
+        return;
+      }
+      
+      if (profile) {
+        setTotalXP(profile.xp || 0);
       }
     };
 
@@ -113,38 +119,63 @@ const Lessons = () => {
   };
 
   const handleQuizComplete = async (isCorrect: boolean) => {
-    if (isCorrect) {
-      const earnedXP = 5;
-      const newTotalXP = totalXP + earnedXP;
-      setTotalXP(newTotalXP);
-      
-      // Update user XP in database
-      if (userId) {
-        try {
-          const { error } = await supabase
-            .from('profiles')
-            .update({ xp: newTotalXP })
-            .eq('id', userId);
-            
-          if (error) throw error;
-        } catch (err) {
-          console.error('Error updating XP:', err);
+    if (isCorrect && userId) {
+      try {
+        const earnedXP = 5;
+        const newTotalXP = totalXP + earnedXP;
+        
+        // First get the current XP to avoid race conditions
+        const { data: currentData, error: fetchError } = await supabase
+          .from('profiles')
+          .select('xp')
+          .eq('id', userId)
+          .single();
+          
+        if (fetchError) {
+          console.error('Error fetching current XP:', fetchError);
           toast.error('Failed to update XP');
+          return;
         }
+        
+        const currentXP = currentData?.xp || 0;
+        const updatedXP = currentXP + earnedXP;
+        
+        // Update the XP in the database
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ xp: updatedXP })
+          .eq('id', userId);
+          
+        if (updateError) {
+          console.error('Error updating XP:', updateError);
+          toast.error('Failed to update XP');
+          return;
+        }
+        
+        // Update local state
+        setTotalXP(updatedXP);
+        toast.success(`+${earnedXP} XP earned!`);
+        
+        // Handle question progression
+        const activeLesson = lessons.find(l => l.id === activeQuiz);
+        if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
+          setCurrentQuestionIndex(prev => prev + 1);
+        } else {
+          const updatedLessons = lessons.map(l =>
+            l.id === activeQuiz ? { ...l, isCompleted: true } : l
+          );
+          setCompletedLessons(updatedLessons.filter(l => l.isCompleted));
+          setActiveQuiz(null);
+          setCurrentQuestionIndex(0);
+          toast.success('Lesson completed!');
+        }
+      } catch (err) {
+        console.error('Error in quiz completion flow:', err);
+        toast.error('Something went wrong. Please try again.');
       }
-      
-      const activeLesson = lessons.find(l => l.id === activeQuiz);
-      if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
-      } else {
-        const updatedLessons = lessons.map(l =>
-          l.id === activeQuiz ? { ...l, isCompleted: true } : l
-        );
-        setCompletedLessons(updatedLessons.filter(l => l.isCompleted));
-        setActiveQuiz(null);
-        setCurrentQuestionIndex(0);
-        toast.success('Lesson completed!');
-      }
+    } else if (!isCorrect) {
+      // Handle incorrect answer
+      toast.error('Try again!');
     }
   };
 
