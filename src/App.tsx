@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Lessons from "./pages/Lessons";
 import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,16 @@ const App = () => {
               element={
                 isAuthenticated ? (
                   <Lessons />
+                ) : (
+                  <Navigate to="/auth" replace />
+                )
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                isAuthenticated ? (
+                  <Admin />
                 ) : (
                   <Navigate to="/auth" replace />
                 )
