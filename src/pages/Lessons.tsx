@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Leaderboard } from "@/components/Leaderboard";
 
 interface Question {
   id: number;
@@ -66,6 +67,7 @@ const Lessons = () => {
   const [totalXP, setTotalXP] = useState(0);
   const [activeQuiz, setActiveQuiz] = useState<number | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
   
   const { data: lessons = [], isLoading, error } = useQuery({
     queryKey: ['lessons'],
@@ -82,6 +84,19 @@ const Lessons = () => {
         navigate('/auth');
         return;
       }
+      
+      setUserId(session.user.id);
+      
+      // Fetch user XP
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('xp')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profile && profile.xp) {
+        setTotalXP(profile.xp);
+      }
     };
 
     checkAuth();
@@ -97,9 +112,26 @@ const Lessons = () => {
     }
   };
 
-  const handleQuizComplete = (isCorrect: boolean) => {
+  const handleQuizComplete = async (isCorrect: boolean) => {
     if (isCorrect) {
-      setTotalXP(prev => prev + 5);
+      const earnedXP = 5;
+      const newTotalXP = totalXP + earnedXP;
+      setTotalXP(newTotalXP);
+      
+      // Update user XP in database
+      if (userId) {
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .update({ xp: newTotalXP })
+            .eq('id', userId);
+            
+          if (error) throw error;
+        } catch (err) {
+          console.error('Error updating XP:', err);
+          toast.error('Failed to update XP');
+        }
+      }
       
       const activeLesson = lessons.find(l => l.id === activeQuiz);
       if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
@@ -183,31 +215,39 @@ const Lessons = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
-              <h2 className="text-xl font-semibold mb-2">Course Progress</h2>
-              <ProgressBar
-                progress={totalXP % 50}
-                total={50}
-                className="max-w-full"
-              />
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
+                  <h2 className="text-xl font-semibold mb-2">Course Progress</h2>
+                  <ProgressBar
+                    progress={totalXP % 50}
+                    total={50}
+                    className="max-w-full"
+                  />
+                </div>
 
-            <div className="space-y-8">
-              {lessons.map((lesson, index) => (
-                <LessonCard
-                  key={lesson.id}
-                  title={lesson.title}
-                  description={lesson.description}
-                  xp={lesson.xp}
-                  difficulty={lesson.difficulty}
-                  isCompleted={lesson.isCompleted}
-                  onClick={() => handleLessonClick(lesson.id)}
-                  number={index + 1}
-                  progress={lesson.isCompleted ? 100 : (lesson.progress || 0)}
-                  isLocked={index > 0 && !lessons[index - 1].isCompleted}
-                  isLast={index === lessons.length - 1}
-                />
-              ))}
+                <div className="space-y-8">
+                  {lessons.map((lesson, index) => (
+                    <LessonCard
+                      key={lesson.id}
+                      title={lesson.title}
+                      description={lesson.description}
+                      xp={lesson.xp}
+                      difficulty={lesson.difficulty}
+                      isCompleted={lesson.isCompleted}
+                      onClick={() => handleLessonClick(lesson.id)}
+                      number={index + 1}
+                      progress={lesson.isCompleted ? 100 : (lesson.progress || 0)}
+                      isLocked={index > 0 && !lessons[index - 1].isCompleted}
+                      isLast={index === lessons.length - 1}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-1">
+                <Leaderboard />
+              </div>
             </div>
           </>
         )}
