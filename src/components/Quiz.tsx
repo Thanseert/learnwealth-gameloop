@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const isCorrect = selectedAnswer === question.correctAnswer;
+  const audioContext = useRef<AudioContext | null>(null);
 
   // Reset selected answer when question changes
   useEffect(() => {
@@ -28,22 +29,88 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     setHasSubmitted(false);
   }, [question]);
 
-  // Create audio elements
+  // Initialize audio context
   useEffect(() => {
-    const correctAudio = new Audio("/correct.mp3");
-    const wrongAudio = new Audio("/wrong.mp3");
+    // Create audio context on component mount
+    audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     
     return () => {
-      correctAudio.pause();
-      wrongAudio.pause();
+      // Clean up audio context when component unmounts
+      if (audioContext.current) {
+        audioContext.current.close();
+      }
     };
   }, []);
+  
+  // Function to play correct answer sound
+  const playCorrectSound = () => {
+    if (!audioContext.current) return;
+    
+    const context = audioContext.current;
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+    
+    // Connect oscillator to gain node
+    oscillator.connect(gainNode);
+    // Connect gain node to audio output
+    gainNode.connect(context.destination);
+    
+    // Set oscillator properties for correct sound (happy sound)
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(523.25, context.currentTime); // C5
+    oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1); // E5
+    oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2); // G5
+    
+    // Set gain (volume)
+    gainNode.gain.setValueAtTime(0.5, context.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
+    
+    // Start and stop the sound
+    oscillator.start(context.currentTime);
+    oscillator.stop(context.currentTime + 0.3);
+  };
+  
+  // Function to play incorrect answer sound
+  const playIncorrectSound = () => {
+    if (!audioContext.current) return;
+    
+    const context = audioContext.current;
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+    
+    // Connect oscillator to gain node
+    oscillator.connect(gainNode);
+    // Connect gain node to audio output
+    gainNode.connect(context.destination);
+    
+    // Set oscillator properties for incorrect sound (sad sound)
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
+    oscillator.frequency.setValueAtTime(349.23, context.currentTime + 0.1); // F4
+    
+    // Set gain (volume)
+    gainNode.gain.setValueAtTime(0.3, context.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
+    
+    // Start and stop the sound
+    oscillator.start(context.currentTime);
+    oscillator.stop(context.currentTime + 0.2);
+  };
 
   const handleCheck = () => {
     setHasSubmitted(true);
-    // Play sound based on answer
-    const audio = new Audio(isCorrect ? "/correct.mp3" : "/wrong.mp3");
-    audio.play();
+    
+    // Resume audio context if it was suspended (browsers require user interaction)
+    if (audioContext.current && audioContext.current.state === 'suspended') {
+      audioContext.current.resume();
+    }
+    
+    // Play appropriate sound based on answer
+    if (isCorrect) {
+      playCorrectSound();
+    } else {
+      playIncorrectSound();
+    }
   };
 
   const handleNext = () => {
