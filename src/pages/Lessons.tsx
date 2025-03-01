@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -35,7 +34,6 @@ interface CompletedLesson {
 }
 
 const fetchLessonsAndQuestions = async () => {
-  // Fetch lessons
   const { data: lessonsData, error: lessonsError } = await supabase
     .from('lessons')
     .select('*')
@@ -43,19 +41,16 @@ const fetchLessonsAndQuestions = async () => {
 
   if (lessonsError) throw lessonsError;
 
-  // Fetch questions for all lessons
   const { data: questionsData, error: questionsError } = await supabase
     .from('questions')
     .select('*');
 
   if (questionsError) throw questionsError;
 
-  // Get completed lessons for current user
   const { data: { session } } = await supabase.auth.getSession();
   let completedLessonIds: number[] = [];
   
   if (session?.user?.id) {
-    // Using a raw SQL query to get around the type issue with the new table
     const { data: completedLessonsData, error: completedLessonsError } = await supabase
       .rpc('get_completed_lessons', { user_id_param: session.user.id });
       
@@ -66,7 +61,6 @@ const fetchLessonsAndQuestions = async () => {
     }
   }
 
-  // Organize questions by lesson and mark completed lessons
   const lessons = lessonsData.map((lesson: any) => ({
     ...lesson,
     isCompleted: completedLessonIds.includes(lesson.id),
@@ -108,7 +102,6 @@ const Lessons = () => {
       
       setUserId(session.user.id);
       
-      // Fetch user XP
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('xp')
@@ -150,20 +143,16 @@ const Lessons = () => {
         const activeLesson = lessons.find(l => l.id === activeQuiz);
         if (!activeLesson) return;
         
-        // Check if this lesson has already been completed
         const isLessonAlreadyCompleted = activeLesson.isCompleted;
         
-        // Update question progress regardless of completion status
         if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1);
           return;
         }
         
-        // Handle lesson completion
         if (!isLessonAlreadyCompleted) {
           const earnedXP = activeLesson.xp || 5;
           
-          // First get the current XP to avoid race conditions
           const { data: currentData, error: fetchError } = await supabase
             .from('profiles')
             .select('xp')
@@ -179,7 +168,6 @@ const Lessons = () => {
           const currentXP = currentData?.xp || 0;
           const updatedXP = currentXP + earnedXP;
           
-          // Update the XP in the database
           const { error: updateError } = await supabase
             .from('profiles')
             .update({ xp: updatedXP })
@@ -191,7 +179,6 @@ const Lessons = () => {
             return;
           }
           
-          // Record this lesson as completed using a raw SQL query or RPC call
           const { error: completionError } = await supabase
             .rpc('record_lesson_completion', { 
               user_id_param: userId,
@@ -204,17 +191,14 @@ const Lessons = () => {
             return;
           }
           
-          // Update local state
           setTotalXP(updatedXP);
           toast.success(`Lesson completed! +${earnedXP} XP earned!`);
           
-          // Refresh lessons data to update completion status
           refetch();
         } else {
           toast.info('You already completed this lesson (no additional XP earned)');
         }
         
-        // Reset quiz state
         setActiveQuiz(null);
         setCurrentQuestionIndex(0);
         
@@ -223,7 +207,6 @@ const Lessons = () => {
         toast.error('Something went wrong. Please try again.');
       }
     } else if (!isCorrect) {
-      // Handle incorrect answer
       toast.error('Try again!');
     }
   };
@@ -233,7 +216,6 @@ const Lessons = () => {
     setCurrentQuestionIndex(0);
   };
 
-  // Calculate the level progress based on XP
   const calculateLevelProgress = () => {
     const xpPerLevel = 50;
     const currentLevelXP = totalXP % xpPerLevel;
@@ -259,7 +241,6 @@ const Lessons = () => {
   const activeLesson = lessons.find(l => l.id === activeQuiz);
   const currentQuestion = activeLesson?.questions?.[currentQuestionIndex];
 
-  // Calculate the percentage of completed lessons
   const completedLessonsCount = lessons.filter(lesson => lesson.isCompleted).length;
   const totalLessonsCount = lessons.length;
   const levelProgress = calculateLevelProgress();
@@ -332,6 +313,7 @@ const Lessons = () => {
                       progress={lesson.isCompleted ? 100 : 0}
                       isLocked={index > 0 && !lessons[index - 1].isCompleted}
                       isLast={index === lessons.length - 1}
+                      questionsCount={lesson.questions?.length || 0}
                     />
                   ))}
                 </div>

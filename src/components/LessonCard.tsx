@@ -15,6 +15,7 @@ interface LessonCardProps {
   progress?: number;
   isLocked?: boolean;
   isLast?: boolean;
+  questionsCount?: number;
 }
 
 export function LessonCard({
@@ -26,6 +27,7 @@ export function LessonCard({
   progress = 0,
   isLocked = false,
   isLast = false,
+  questionsCount = 0,
 }: LessonCardProps) {
   return (
     <div className="flex items-start gap-8 relative animate-fade-in">
@@ -78,8 +80,7 @@ export function LessonCard({
                 className="h-2 bg-[#f1f5f9]" 
               />
               <div className="flex items-center justify-start gap-6 text-sm text-[#64748b]">
-                <span>{Math.round(progress * 0.15)}/15 Lessons</span>
-                <span>{Math.round(progress * 0.1)}/10 Practice</span>
+                <span>{questionsCount} Questions</span>
               </div>
             </div>
           )}
