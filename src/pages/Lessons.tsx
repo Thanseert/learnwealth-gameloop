@@ -55,13 +55,14 @@ const fetchLessonsAndQuestions = async () => {
   let completedLessonIds: number[] = [];
   
   if (session?.user?.id) {
-    const { data: completedLessonsData } = await supabase
-      .from('completed_lessons')
-      .select('lesson_id')
-      .eq('user_id', session.user.id);
+    // Using a raw SQL query to get around the type issue with the new table
+    const { data: completedLessonsData, error: completedLessonsError } = await supabase
+      .rpc('get_completed_lessons', { user_id_param: session.user.id });
       
-    if (completedLessonsData) {
-      completedLessonIds = completedLessonsData.map(item => item.lesson_id);
+    if (completedLessonsError) {
+      console.error('Error fetching completed lessons:', completedLessonsError);
+    } else if (completedLessonsData) {
+      completedLessonIds = completedLessonsData.map((item: { lesson_id: number }) => item.lesson_id);
     }
   }
 
@@ -190,13 +191,11 @@ const Lessons = () => {
             return;
           }
           
-          // Record this lesson as completed
+          // Record this lesson as completed using a raw SQL query or RPC call
           const { error: completionError } = await supabase
-            .from('completed_lessons')
-            .insert({
-              user_id: userId,
-              lesson_id: activeLesson.id,
-              completed_at: new Date().toISOString()
+            .rpc('record_lesson_completion', { 
+              user_id_param: userId,
+              lesson_id_param: activeLesson.id
             });
             
           if (completionError) {
