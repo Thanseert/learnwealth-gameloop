@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Settings } from "lucide-react";
+import { LogOut, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -64,10 +64,6 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
         <div className="container max-w-6xl mx-auto px-4 py-20">
           <div className="flex justify-end mb-8 gap-4">
-            <Button variant="outline" onClick={() => navigate('/admin')}>
-              <Settings className="mr-2 h-4 w-4" />
-              Admin Panel
-            </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out

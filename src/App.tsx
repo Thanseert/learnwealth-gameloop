@@ -16,11 +16,17 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     // Check initial auth state
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
+      
+      // If authenticated, check if user is admin
+      if (session) {
+        checkAdminStatus(session.user.id);
+      }
     });
 
     // Listen for auth changes
@@ -28,10 +34,29 @@ const App = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
+      
+      // If authentication state changes, check admin status
+      if (session) {
+        checkAdminStatus(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkAdminStatus = async (userId: string) => {
+    // In a real app, you would check if the user has admin role
+    // For this example, we'll just check if the email contains 'admin'
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user?.email?.includes('admin')) {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  };
 
   // Show nothing while we check the initial auth state
   if (isAuthenticated === null) return null;
@@ -66,10 +91,10 @@ const App = () => {
             <Route
               path="/admin"
               element={
-                isAuthenticated ? (
+                isAuthenticated && isAdmin ? (
                   <Admin />
                 ) : (
-                  <Navigate to="/auth" replace />
+                  <Navigate to="/" replace />
                 )
               }
             />
