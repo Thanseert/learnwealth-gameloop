@@ -142,7 +142,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_completed_lessons: {
+        Args: {
+          user_id_param: string
+        }
+        Returns: {
+          lesson_id: number
+        }[]
+      }
+      record_lesson_completion: {
+        Args: {
+          user_id_param: string
+          lesson_id_param: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       difficulty_level: "easy" | "medium" | "hard"
