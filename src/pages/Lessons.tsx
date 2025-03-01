@@ -233,6 +233,13 @@ const Lessons = () => {
     setCurrentQuestionIndex(0);
   };
 
+  // Calculate the level progress based on XP
+  const calculateLevelProgress = () => {
+    const xpPerLevel = 50;
+    const currentLevelXP = totalXP % xpPerLevel;
+    return currentLevelXP;
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -251,6 +258,11 @@ const Lessons = () => {
 
   const activeLesson = lessons.find(l => l.id === activeQuiz);
   const currentQuestion = activeLesson?.questions?.[currentQuestionIndex];
+
+  // Calculate the percentage of completed lessons
+  const completedLessonsCount = lessons.filter(lesson => lesson.isCompleted).length;
+  const totalLessonsCount = lessons.length;
+  const levelProgress = calculateLevelProgress();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -300,7 +312,7 @@ const Lessons = () => {
                 <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
                   <h2 className="text-xl font-semibold mb-2">Course Progress</h2>
                   <ProgressBar
-                    progress={totalXP % 50}
+                    progress={levelProgress}
                     total={50}
                     className="max-w-full"
                   />
@@ -317,7 +329,7 @@ const Lessons = () => {
                       isCompleted={lesson.isCompleted}
                       onClick={() => handleLessonClick(lesson.id, index > 0 && !lessons[index - 1].isCompleted)}
                       number={index + 1}
-                      progress={lesson.isCompleted ? 100 : (lesson.progress || 0)}
+                      progress={lesson.isCompleted ? 100 : 0}
                       isLocked={index > 0 && !lessons[index - 1].isCompleted}
                       isLast={index === lessons.length - 1}
                     />
