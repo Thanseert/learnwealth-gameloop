@@ -8,6 +8,10 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// The admin password - in a real application, this would be stored server-side or in environment variables
+const ADMIN_PASSWORD = "adminPass123";
 
 interface Question {
   id: number;
@@ -44,6 +48,8 @@ const fetchLessonsAndQuestions = async () => {
 const Admin = () => {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [newQuestion, setNewQuestion] = useState({
     title: "",
@@ -54,7 +60,8 @@ const Admin = () => {
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-data'],
-    queryFn: fetchLessonsAndQuestions
+    queryFn: fetchLessonsAndQuestions,
+    enabled: isAuthenticated && isAdmin
   });
 
   useEffect(() => {
@@ -66,13 +73,28 @@ const Admin = () => {
         return;
       }
       
-      // In a real app, you'd check if the user has admin permissions
-      // For now, we'll just set everyone as admin for demo purposes
-      setIsAdmin(true);
+      // Check if the user has an admin email
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email?.includes('admin')) {
+        setIsAdmin(true);
+      } else {
+        toast.error('You do not have admin privileges');
+        navigate('/');
+      }
     };
 
     checkAuth();
   }, [navigate]);
+
+  const handleAdminLogin = () => {
+    if (password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      toast.success('Admin authentication successful');
+      localStorage.setItem('adminAuthenticated', 'true');
+    } else {
+      toast.error('Incorrect admin password');
+    }
+  };
 
   const handleAddQuestion = async () => {
     try {
@@ -190,6 +212,49 @@ const Admin = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-red-500">You don't have permission to access this page.</div>
+      </div>
+    );
+  }
+
+  // If admin email is valid but password has not been entered
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+                className="hover:bg-gray-100"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <CardTitle>Admin Authentication</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-gray-600">Please enter the admin password to continue.</p>
+              <div className="space-y-2">
+                <Label htmlFor="admin-password">Admin Password</Label>
+                <Input 
+                  id="admin-password" 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAdminLogin();
+                  }}
+                />
+              </div>
+              <Button onClick={handleAdminLogin} className="w-full">
+                Access Admin Panel
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
