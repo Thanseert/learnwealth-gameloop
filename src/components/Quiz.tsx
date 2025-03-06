@@ -34,6 +34,17 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     // Create audio context on component mount
     audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     
+    // Ensure audio context is started (needed for some browsers)
+    if (audioContext.current && audioContext.current.state === 'suspended') {
+      const resumeAudio = () => {
+        if (audioContext.current && audioContext.current.state === 'suspended') {
+          audioContext.current.resume();
+        }
+        document.removeEventListener('click', resumeAudio);
+      };
+      document.addEventListener('click', resumeAudio);
+    }
+    
     return () => {
       // Clean up audio context when component unmounts
       if (audioContext.current) {
@@ -47,6 +58,12 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     if (!audioContext.current) return;
     
     const context = audioContext.current;
+    
+    // Force resume the audio context
+    if (context.state === 'suspended') {
+      context.resume();
+    }
+    
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
     
@@ -61,13 +78,31 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1); // E5
     oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2); // G5
     
-    // Set gain (volume) - INCREASED from 0.5 to 0.8
-    gainNode.gain.setValueAtTime(0.8, context.currentTime);
+    // Set gain (volume) to maximum (1.0)
+    gainNode.gain.setValueAtTime(1.0, context.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
     
     // Start and stop the sound
     oscillator.start(context.currentTime);
     oscillator.stop(context.currentTime + 0.3);
+    
+    // Create a second oscillator for a fuller sound
+    const oscillator2 = context.createOscillator();
+    const gainNode2 = context.createGain();
+    
+    oscillator2.connect(gainNode2);
+    gainNode2.connect(context.destination);
+    
+    oscillator2.type = 'triangle';
+    oscillator2.frequency.setValueAtTime(261.63, context.currentTime); // C4
+    oscillator2.frequency.setValueAtTime(329.63, context.currentTime + 0.1); // E4
+    oscillator2.frequency.setValueAtTime(392.00, context.currentTime + 0.2); // G4
+    
+    gainNode2.gain.setValueAtTime(0.8, context.currentTime);
+    gainNode2.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
+    
+    oscillator2.start(context.currentTime);
+    oscillator2.stop(context.currentTime + 0.3);
   };
   
   // Function to play incorrect answer sound
@@ -75,6 +110,12 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     if (!audioContext.current) return;
     
     const context = audioContext.current;
+    
+    // Force resume the audio context
+    if (context.state === 'suspended') {
+      context.resume();
+    }
+    
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
     
@@ -88,28 +129,47 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
     oscillator.frequency.setValueAtTime(349.23, context.currentTime + 0.1); // F4
     
-    // Set gain (volume) - INCREASED from 0.3 to 0.6
-    gainNode.gain.setValueAtTime(0.6, context.currentTime);
+    // Set gain (volume) to maximum (1.0)
+    gainNode.gain.setValueAtTime(1.0, context.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
     
     // Start and stop the sound
     oscillator.start(context.currentTime);
     oscillator.stop(context.currentTime + 0.2);
+    
+    // Add a second oscillator for a stronger wrong answer sound
+    const oscillator2 = context.createOscillator();
+    const gainNode2 = context.createGain();
+    
+    oscillator2.connect(gainNode2);
+    gainNode2.connect(context.destination);
+    
+    oscillator2.type = 'sawtooth';
+    oscillator2.frequency.setValueAtTime(220, context.currentTime); // A3
+    oscillator2.frequency.setValueAtTime(174.61, context.currentTime + 0.1); // F3
+    
+    gainNode2.gain.setValueAtTime(0.7, context.currentTime);
+    gainNode2.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
+    
+    oscillator2.start(context.currentTime);
+    oscillator2.stop(context.currentTime + 0.2);
   };
 
   const handleCheck = () => {
     setHasSubmitted(true);
     
-    // Resume audio context if it was suspended (browsers require user interaction)
-    if (audioContext.current && audioContext.current.state === 'suspended') {
-      audioContext.current.resume();
-    }
-    
-    // Play appropriate sound based on answer
-    if (isCorrect) {
-      playCorrectSound();
-    } else {
-      playIncorrectSound();
+    // Force resume audio context if it was suspended
+    if (audioContext.current) {
+      audioContext.current.resume().then(() => {
+        // Play appropriate sound based on answer
+        if (isCorrect) {
+          playCorrectSound();
+        } else {
+          playIncorrectSound();
+        }
+      }).catch(err => {
+        console.error("Failed to resume audio context:", err);
+      });
     }
   };
 
