@@ -61,8 +61,8 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1); // E5
     oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2); // G5
     
-    // Set gain (volume)
-    gainNode.gain.setValueAtTime(0.5, context.currentTime);
+    // Set gain (volume) - INCREASED from 0.5 to 0.8
+    gainNode.gain.setValueAtTime(0.8, context.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
     
     // Start and stop the sound
@@ -88,8 +88,8 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
     oscillator.frequency.setValueAtTime(349.23, context.currentTime + 0.1); // F4
     
-    // Set gain (volume)
-    gainNode.gain.setValueAtTime(0.3, context.currentTime);
+    // Set gain (volume) - INCREASED from 0.3 to 0.6
+    gainNode.gain.setValueAtTime(0.6, context.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
     
     // Start and stop the sound
