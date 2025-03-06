@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -53,7 +52,7 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     };
   }, []);
   
-  // Function to play correct answer sound
+  // Function to play correct answer sound - now consistent for all correct answers
   const playCorrectSound = () => {
     if (!audioContext.current) return;
     
@@ -64,29 +63,26 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
       context.resume();
     }
     
+    // Create main oscillator
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
     
-    // Connect oscillator to gain node
     oscillator.connect(gainNode);
-    // Connect gain node to audio output
     gainNode.connect(context.destination);
     
-    // Set oscillator properties for correct sound (happy sound)
+    // Set consistent properties for correct sound (happy sound)
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(523.25, context.currentTime); // C5
-    oscillator.frequency.setValueAtTime(659.25, context.currentTime + 0.1); // E5
-    oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.2); // G5
+    oscillator.frequency.setValueAtTime(587.33, context.currentTime); // D5
+    oscillator.frequency.setValueAtTime(783.99, context.currentTime + 0.1); // G5
     
-    // Set gain (volume) to maximum (1.0)
+    // Set gain to maximum
     gainNode.gain.setValueAtTime(1.0, context.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
     
-    // Start and stop the sound
     oscillator.start(context.currentTime);
     oscillator.stop(context.currentTime + 0.3);
     
-    // Create a second oscillator for a fuller sound
+    // Add second oscillator for fuller sound
     const oscillator2 = context.createOscillator();
     const gainNode2 = context.createGain();
     
@@ -94,18 +90,16 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     gainNode2.connect(context.destination);
     
     oscillator2.type = 'triangle';
-    oscillator2.frequency.setValueAtTime(261.63, context.currentTime); // C4
-    oscillator2.frequency.setValueAtTime(329.63, context.currentTime + 0.1); // E4
-    oscillator2.frequency.setValueAtTime(392.00, context.currentTime + 0.2); // G4
+    oscillator2.frequency.setValueAtTime(392.00, context.currentTime); // G4
     
-    gainNode2.gain.setValueAtTime(0.8, context.currentTime);
+    gainNode2.gain.setValueAtTime(1.0, context.currentTime);
     gainNode2.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
     
     oscillator2.start(context.currentTime);
     oscillator2.stop(context.currentTime + 0.3);
   };
   
-  // Function to play incorrect answer sound
+  // Function to play incorrect answer sound - now consistent for all incorrect answers
   const playIncorrectSound = () => {
     if (!audioContext.current) return;
     
@@ -116,26 +110,23 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
       context.resume();
     }
     
+    // Create main oscillator
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
     
-    // Connect oscillator to gain node
     oscillator.connect(gainNode);
-    // Connect gain node to audio output
     gainNode.connect(context.destination);
     
-    // Set oscillator properties for incorrect sound (sad sound)
-    oscillator.type = 'triangle';
-    oscillator.frequency.setValueAtTime(440, context.currentTime); // A4
-    oscillator.frequency.setValueAtTime(349.23, context.currentTime + 0.1); // F4
+    // Set consistent properties for incorrect sound (sad sound)
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(220, context.currentTime); // A3
     
-    // Set gain (volume) to maximum (1.0)
+    // Set gain to maximum
     gainNode.gain.setValueAtTime(1.0, context.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
     
-    // Start and stop the sound
     oscillator.start(context.currentTime);
-    oscillator.stop(context.currentTime + 0.2);
+    oscillator.stop(context.currentTime + 0.3);
     
     // Add a second oscillator for a stronger wrong answer sound
     const oscillator2 = context.createOscillator();
@@ -144,15 +135,14 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
     oscillator2.connect(gainNode2);
     gainNode2.connect(context.destination);
     
-    oscillator2.type = 'sawtooth';
-    oscillator2.frequency.setValueAtTime(220, context.currentTime); // A3
-    oscillator2.frequency.setValueAtTime(174.61, context.currentTime + 0.1); // F3
+    oscillator2.type = 'triangle';
+    oscillator2.frequency.setValueAtTime(196.00, context.currentTime); // G3
     
-    gainNode2.gain.setValueAtTime(0.7, context.currentTime);
-    gainNode2.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
+    gainNode2.gain.setValueAtTime(1.0, context.currentTime);
+    gainNode2.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
     
     oscillator2.start(context.currentTime);
-    oscillator2.stop(context.currentTime + 0.2);
+    oscillator2.stop(context.currentTime + 0.3);
   };
 
   const handleCheck = () => {
