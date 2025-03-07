@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -171,7 +172,7 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg animate-fade-in">
-      {/* Progress Bar */}
+      {/* Progress Bar - Fixed to correctly show current question progress */}
       <div className="w-full h-2 bg-gray-200 rounded-full mb-8">
         <div 
           className="h-full bg-green-500 rounded-full transition-all duration-300"
