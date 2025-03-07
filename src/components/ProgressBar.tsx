@@ -16,11 +16,15 @@ export function ProgressBar({ progress, total, className }: ProgressBarProps) {
         <span className="font-medium">Progress</span>
         <span>{Math.round(percentage)}%</span>
       </div>
-      <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
         <div
-          className="h-full bg-primary transition-all duration-500 ease-out rounded-full"
+          className="h-full bg-gradient-to-r from-purple-500 via-primary to-purple-400 transition-all duration-1000 ease-out rounded-full relative"
           style={{ width: `${percentage}%` }}
-        />
+        >
+          {percentage > 10 && (
+            <div className="absolute inset-0 bg-white opacity-20 animate-pulse"></div>
+          )}
+        </div>
       </div>
     </div>
   );

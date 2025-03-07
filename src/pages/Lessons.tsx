@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { ProgressBar } from "@/components/ProgressBar";
-import { Trophy, Coins, ArrowLeft } from "lucide-react";
+import { Trophy, Coins, ArrowLeft, Award, Star, Gift } from "lucide-react";
 import { Quiz } from "@/components/Quiz";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,7 @@ const Lessons = () => {
   const [activeQuiz, setActiveQuiz] = useState<number | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [showRewardAnimation, setShowRewardAnimation] = useState(false);
   
   const { data: lessons = [], isLoading, error, refetch } = useQuery({
     queryKey: ['lessons'],
@@ -192,7 +194,16 @@ const Lessons = () => {
           }
           
           setTotalXP(updatedXP);
-          toast.success(`Lesson completed! +${earnedXP} XP earned!`);
+          setShowRewardAnimation(true);
+          
+          // Hide the reward animation after 3 seconds
+          setTimeout(() => {
+            setShowRewardAnimation(false);
+          }, 3000);
+          
+          toast.success(`Level completed! +${earnedXP} XP earned!`, {
+            icon: <Trophy className="text-yellow-500 h-5 w-5" />
+          });
           
           refetch();
         } else {
@@ -226,8 +237,11 @@ const Lessons = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading lessons...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 to-white">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-16 h-16 bg-purple-400 rounded-full mb-4 animate-bounce"></div>
+          <div className="text-purple-800 font-bold">Loading your adventure...</div>
+        </div>
       </div>
     );
   }
@@ -246,10 +260,37 @@ const Lessons = () => {
   const completedLessonsCount = lessons.filter(lesson => lesson.isCompleted).length;
   const totalLessonsCount = lessons.length;
   const levelProgress = calculateLevelProgress();
+  const currentLevel = Math.floor(totalXP / 50) + 1;
+  const xpToNextLevel = 50 - (totalXP % 50);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <div className="container py-8 space-y-8 animate-fade-in max-w-4xl mx-auto">
+        {/* XP Reward Animation */}
+        {showRewardAnimation && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div className="relative">
+              <div className="text-6xl font-bold text-yellow-500 animate-ping mb-20">
+                +{activeLesson?.xp} XP
+              </div>
+              {[...Array(20)].map((_, i) => (
+                <div 
+                  key={i}
+                  className="absolute rounded-full"
+                  style={{
+                    width: `${Math.random() * 20 + 5}px`,
+                    height: `${Math.random() * 20 + 5}px`,
+                    backgroundColor: `hsl(${Math.random() * 60 + 40}, 100%, 50%)`,
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    animation: `fall-${i % 5} 3s ease-out infinite`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {activeQuiz && currentQuestion ? (
           <Quiz
             question={{
@@ -270,30 +311,41 @@ const Lessons = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => navigate("/")}
-                  className="hover:bg-gray-100"
+                  className="hover:bg-purple-100 text-purple-800"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Financial Education
+                <h1 className="text-3xl font-bold text-purple-900">
+                  Financial Adventure
                 </h1>
               </div>
               <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Trophy className="w-5 h-5 text-primary" />
-                  <span className="font-semibold">{totalXP} XP</span>
+                <div className="flex items-center space-x-2 bg-purple-100 px-3 py-2 rounded-lg">
+                  <Trophy className="w-5 h-5 text-purple-600" />
+                  <span className="font-bold text-purple-800">{totalXP} XP</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Coins className="w-5 h-5 text-yellow-500" />
-                  <span className="font-semibold">Level {Math.floor(totalXP / 50) + 1}</span>
+                <div className="flex flex-col items-center bg-yellow-100 px-3 py-1 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Star className="w-5 h-5 text-yellow-600" />
+                    <span className="font-bold text-yellow-800">Level {currentLevel}</span>
+                  </div>
+                  <div className="text-xs text-yellow-600">
+                    {xpToNextLevel} XP to next level
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
-                  <h2 className="text-xl font-semibold mb-2">Course Progress</h2>
+                <div className="bg-white rounded-lg p-6 shadow-md mb-8 border border-purple-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <h2 className="text-xl font-bold text-purple-900">Quest Progress</h2>
+                    <div className="flex items-center text-sm font-medium text-purple-600">
+                      <Award className="w-4 h-4 mr-1" />
+                      {completedLessonsCount}/{totalLessonsCount} Completed
+                    </div>
+                  </div>
                   <ProgressBar
                     progress={completedLessonsCount}
                     total={totalLessonsCount}
