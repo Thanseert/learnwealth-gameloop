@@ -218,8 +218,10 @@ const Lessons = () => {
 
   const calculateLevelProgress = () => {
     const xpPerLevel = 50;
-    const currentLevelXP = totalXP % xpPerLevel;
-    return currentLevelXP;
+    const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
+    const xpInCurrentLevel = totalXP % xpPerLevel;
+    const progressPercentage = (xpInCurrentLevel / xpPerLevel) * 100;
+    return progressPercentage;
   };
 
   if (isLoading) {
@@ -293,8 +295,8 @@ const Lessons = () => {
                 <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
                   <h2 className="text-xl font-semibold mb-2">Course Progress</h2>
                   <ProgressBar
-                    progress={levelProgress}
-                    total={50}
+                    progress={completedLessonsCount}
+                    total={totalLessonsCount}
                     className="max-w-full"
                   />
                 </div>
