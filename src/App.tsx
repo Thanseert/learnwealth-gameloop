@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  // We'll keep the isAdmin state for future use, but won't check email
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
@@ -91,10 +91,10 @@ const App = () => {
             <Route
               path="/admin"
               element={
-                isAuthenticated && isAdmin ? (
+                isAuthenticated ? (
                   <Admin />
                 ) : (
-                  <Navigate to="/" replace />
+                  <Navigate to="/auth" replace />
                 )
               }
             />

@@ -20,14 +20,6 @@ const AdminLoginForm = ({ isAdmin, onAuthenticated }: AdminLoginFormProps) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-500">You don't have permission to access this page.</div>
-      </div>
-    );
-  }
-
   const handleAdminLogin = () => {
     if (password === ADMIN_PASSWORD) {
       onAuthenticated();

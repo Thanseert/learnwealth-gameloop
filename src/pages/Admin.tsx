@@ -44,7 +44,8 @@ const fetchLessonsAndQuestions = async () => {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Simply track if admin password has been entered
+  const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   
@@ -60,16 +61,6 @@ const Admin = () => {
       if (!session) {
         toast.error('Please sign in to access admin panel');
         navigate('/auth');
-        return;
-      }
-      
-      // Check if the user has an admin email
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email?.includes('admin')) {
-        setIsAdmin(true);
-      } else {
-        toast.error('You do not have admin privileges');
-        navigate('/');
       }
     };
 
