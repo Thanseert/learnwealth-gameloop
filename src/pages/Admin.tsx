@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/react-query";
 import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import QuestionForm from "@/components/admin/QuestionForm";
 import QuestionList from "@/components/admin/QuestionList";
+import LevelForm from "@/components/admin/LevelForm";
+import LevelList from "@/components/admin/LevelList";
 
 interface Question {
   id: number;
@@ -27,7 +29,7 @@ const fetchLessonsAndQuestions = async () => {
   // Fetch lessons
   const { data: lessonsData, error: lessonsError } = await supabase
     .from('lessons')
-    .select('id, title')
+    .select('id, title, description, difficulty, order, xp')
     .order('order');
 
   if (lessonsError) throw lessonsError;
@@ -48,6 +50,7 @@ const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [activeTab, setActiveTab] = useState<'questions' | 'levels'>('questions');
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-data'],
@@ -108,21 +111,50 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Add/Edit Question Form */}
-        <QuestionForm
-          lessons={lessons}
-          editingQuestion={editingQuestion}
-          setEditingQuestion={setEditingQuestion}
-          onQuestionUpdated={refetch}
-        />
+        {/* Tab navigation */}
+        <div className="flex space-x-2 border-b pb-2">
+          <Button 
+            variant={activeTab === 'questions' ? 'default' : 'ghost'}
+            onClick={() => setActiveTab('questions')}
+          >
+            Manage Questions
+          </Button>
+          <Button 
+            variant={activeTab === 'levels' ? 'default' : 'ghost'}
+            onClick={() => setActiveTab('levels')}
+          >
+            Manage Levels
+          </Button>
+        </div>
 
-        {/* Questions List */}
-        <QuestionList
-          questions={questions}
-          lessons={lessons}
-          onQuestionDeleted={refetch}
-          onEditQuestion={setEditingQuestion}
-        />
+        {/* Tab content */}
+        <div className="space-y-8">
+          {activeTab === 'questions' && (
+            <>
+              <QuestionForm
+                lessons={lessons}
+                editingQuestion={editingQuestion}
+                setEditingQuestion={setEditingQuestion}
+                onQuestionUpdated={refetch}
+              />
+
+              <QuestionList
+                questions={questions}
+                lessons={lessons}
+                onQuestionDeleted={refetch}
+                onEditQuestion={setEditingQuestion}
+              />
+            </>
+          )}
+
+          {activeTab === 'levels' && (
+            <>
+              <LevelForm onLevelAdded={refetch} />
+              
+              <LevelList lessons={lessons} onLevelDeleted={refetch} />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
