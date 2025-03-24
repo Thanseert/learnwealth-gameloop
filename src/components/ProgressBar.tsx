@@ -58,9 +58,9 @@ export function ProgressBar({ progress, total, className }: ProgressBarProps) {
             {milestone === 100 && isComplete ? (
               <Trophy className="w-4 h-4 text-yellow-500" />
             ) : milestone === 75 ? (
-              <Star className="w-4 h-4" className={percentage >= milestone ? "text-purple-500" : "text-gray-300"} />
+              <Star className={percentage >= milestone ? "w-4 h-4 text-purple-500" : "w-4 h-4 text-gray-300"} />
             ) : milestone === 50 ? (
-              <Award className="w-4 h-4" className={percentage >= milestone ? "text-purple-500" : "text-gray-300"} />
+              <Award className={percentage >= milestone ? "w-4 h-4 text-purple-500" : "w-4 h-4 text-gray-300"} />
             ) : (
               <div className={cn(
                 "w-2 h-2 rounded-full border",

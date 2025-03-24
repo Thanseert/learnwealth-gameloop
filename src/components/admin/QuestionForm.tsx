@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +14,7 @@ interface Question {
   options: string[];
   correct_answer: string;
   lesson_id: number;
+  explanation?: string;
 }
 
 interface Lesson {
@@ -37,7 +39,8 @@ const QuestionForm = ({
     title: "",
     options: ["", "", "", ""],
     correct_answer: "",
-    lesson_id: 0
+    lesson_id: 0,
+    explanation: ""
   });
 
   const handleOptionChange = (index: number, value: string, isEditing: boolean) => {
@@ -55,7 +58,7 @@ const QuestionForm = ({
   const handleAddQuestion = async () => {
     try {
       if (!newQuestion.title || newQuestion.options.some(opt => !opt) || !newQuestion.correct_answer || !newQuestion.lesson_id) {
-        toast.error('Please fill in all fields');
+        toast.error('Please fill in all required fields');
         return;
       }
 
@@ -66,7 +69,8 @@ const QuestionForm = ({
             title: newQuestion.title,
             options: newQuestion.options,
             correct_answer: newQuestion.correct_answer,
-            lesson_id: newQuestion.lesson_id
+            lesson_id: newQuestion.lesson_id,
+            explanation: newQuestion.explanation || null
           }
         ]);
 
@@ -77,7 +81,8 @@ const QuestionForm = ({
         title: "",
         options: ["", "", "", ""],
         correct_answer: "",
-        lesson_id: 0
+        lesson_id: 0,
+        explanation: ""
       });
       onQuestionUpdated();
     } catch (err) {
@@ -91,7 +96,7 @@ const QuestionForm = ({
       if (!editingQuestion) return;
       
       if (!editingQuestion.title || editingQuestion.options.some(opt => !opt) || !editingQuestion.correct_answer || !editingQuestion.lesson_id) {
-        toast.error('Please fill in all fields');
+        toast.error('Please fill in all required fields');
         return;
       }
 
@@ -101,7 +106,8 @@ const QuestionForm = ({
           title: editingQuestion.title,
           options: editingQuestion.options,
           correct_answer: editingQuestion.correct_answer,
-          lesson_id: editingQuestion.lesson_id
+          lesson_id: editingQuestion.lesson_id,
+          explanation: editingQuestion.explanation || null
         })
         .eq('id', editingQuestion.id);
 
@@ -188,6 +194,23 @@ const QuestionForm = ({
               </div>
             ))}
           </div>
+        </div>
+        
+        <div>
+          <Label htmlFor="explanation">Explanation (Optional)</Label>
+          <Textarea
+            id="explanation"
+            value={editingQuestion ? editingQuestion.explanation || "" : newQuestion.explanation}
+            onChange={(e) => {
+              if (editingQuestion) {
+                setEditingQuestion({ ...editingQuestion, explanation: e.target.value });
+              } else {
+                setNewQuestion({ ...newQuestion, explanation: e.target.value });
+              }
+            }}
+            placeholder="Provide an explanation for this question that will be shown after answering"
+            className="min-h-[100px]"
+          />
         </div>
         
         <div className="flex justify-end gap-2">
