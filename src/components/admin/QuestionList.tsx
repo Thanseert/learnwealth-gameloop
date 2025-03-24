@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,6 +10,7 @@ interface Question {
   options: string[];
   correct_answer: string;
   lesson_id: number;
+  explanation?: string;
 }
 
 interface Lesson {
@@ -57,7 +58,7 @@ const QuestionList = ({ questions, lessons, onQuestionDeleted, onEditQuestion }:
             return (
               <div key={question.id} className="border rounded-lg p-4 hover:bg-gray-50">
                 <div className="flex justify-between">
-                  <div>
+                  <div className="w-full">
                     <span className="text-xs text-gray-500">Lesson: {lesson?.title || 'Unknown'}</span>
                     <h3 className="font-medium">{question.title}</h3>
                     <div className="mt-2 space-y-1">
@@ -70,6 +71,13 @@ const QuestionList = ({ questions, lessons, onQuestionDeleted, onEditQuestion }:
                         </div>
                       ))}
                     </div>
+                    
+                    {question.explanation && (
+                      <div className="mt-2 flex items-center gap-1 text-blue-600">
+                        <Lightbulb className="h-4 w-4" />
+                        <span className="text-sm italic">Has explanation</span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" onClick={() => onEditQuestion(question)}>

@@ -106,6 +106,7 @@ export type Database = {
         Row: {
           correct_answer: string
           created_at: string
+          explanation: string | null
           id: number
           lesson_id: number | null
           options: string[]
@@ -114,6 +115,7 @@ export type Database = {
         Insert: {
           correct_answer: string
           created_at?: string
+          explanation?: string | null
           id?: number
           lesson_id?: number | null
           options: string[]
@@ -122,6 +124,7 @@ export type Database = {
         Update: {
           correct_answer?: string
           created_at?: string
+          explanation?: string | null
           id?: number
           lesson_id?: number | null
           options?: string[]
