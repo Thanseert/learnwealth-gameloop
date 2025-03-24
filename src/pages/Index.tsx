@@ -2,21 +2,29 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, BookOpen, Rocket, TrendingUp, DollarSign } from "lucide-react";
+import { LogOut, BookOpen, Rocket, TrendingUp, DollarSign, Gamepad, Award } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+
+// Define the correct type for floating icons
+type FloatingIcon = {
+  id: number;
+  iconType: string;
+  left: number;
+  delay: number;
+};
 
 const Index = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [floatingIcons, setFloatingIcons] = useState<{ id: number; icon: string; left: number; delay: number }[]>([]);
+  const [floatingIcons, setFloatingIcons] = useState<FloatingIcon[]>([]);
 
   useEffect(() => {
-    // Create floating finance icons for the background
+    // Create floating finance icons for the background with proper typing
     const icons = Array.from({ length: 15 }, (_, i) => ({
       id: i,
-      icon: [<DollarSign key={`dollar-${i}`} />, <TrendingUp key={`trend-${i}`} />, "💰", "📈", "💎", "🪙", "📊"][
+      iconType: ["dollar", "trend", "money", "chart", "diamond", "coin", "analytics"][
         Math.floor(Math.random() * 7)
       ],
       left: Math.random() * 100,
@@ -63,6 +71,20 @@ const Index = () => {
     }
   };
 
+  // Helper function to render icons based on type
+  const renderIcon = (type: string, key: number) => {
+    switch(type) {
+      case "dollar": return <DollarSign key={key} className="h-6 w-6" />;
+      case "trend": return <TrendingUp key={key} className="h-6 w-6" />;
+      case "money": return <span key={key}>💰</span>;
+      case "chart": return <span key={key}>📈</span>;
+      case "diamond": return <span key={key}>💎</span>;
+      case "coin": return <span key={key}>🪙</span>;
+      case "analytics": return <span key={key}>📊</span>;
+      default: return <DollarSign key={key} className="h-6 w-6" />;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0d101e] to-[#162553]">
@@ -71,6 +93,7 @@ const Index = () => {
     );
   }
 
+  // Render game-like welcome page for authenticated users
   if (userData) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0d101e] to-[#162553] overflow-hidden relative">
@@ -87,44 +110,65 @@ const Index = () => {
                 animationDelay: `${item.delay}s`,
               }}
             >
-              {item.icon}
+              {renderIcon(item.iconType, item.id)}
             </div>
           ))}
         </div>
 
-        <div className="container max-w-6xl mx-auto px-4 py-20 relative z-10">
-          <div className="flex justify-end mb-8 gap-4">
+        <div className="container mx-auto px-4 py-8 relative z-10">
+          <div className="flex justify-end mb-8">
             <Button variant="outline" onClick={handleLogout} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 text-white">
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </Button>
           </div>
-          <div className="flex flex-col items-center justify-center space-y-8 mt-20">
-            <div className="text-center space-y-4">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-br from-purple-400 via-pink-500 to-yellow-500 animate-pulse">
-                Welcome back, <span className="text-white">{userData.username}!</span>
-              </h1>
-              <p className="text-gray-300 text-lg sm:text-xl max-w-3xl mx-auto">
-                Continue your journey to financial mastery
-              </p>
+          
+          <div className="flex flex-col items-center justify-center space-y-12 mt-12">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-purple-300 mb-2">Welcome back,</h2>
+              <h1 className="text-4xl font-extrabold text-white mb-6">{userData.username}</h1>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-4xl mx-auto">
+                <div className="game-card bg-gradient-to-br from-purple-800/40 to-indigo-900/40 backdrop-blur-md p-6 rounded-xl border border-purple-500/30 hover:border-purple-400/50 transition-all">
+                  <div className="rounded-full bg-purple-600/30 w-14 h-14 flex items-center justify-center mb-4 mx-auto">
+                    <BookOpen className="text-purple-200 h-7 w-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Learn</h3>
+                  <p className="text-purple-200 text-sm">Explore financial concepts through interactive lessons</p>
+                </div>
+
+                <div className="game-card bg-gradient-to-br from-blue-800/40 to-cyan-900/40 backdrop-blur-md p-6 rounded-xl border border-blue-500/30 hover:border-blue-400/50 transition-all">
+                  <div className="rounded-full bg-blue-600/30 w-14 h-14 flex items-center justify-center mb-4 mx-auto">
+                    <Award className="text-blue-200 h-7 w-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Achieve</h3>
+                  <p className="text-blue-200 text-sm">Complete challenges and earn achievements</p>
+                </div>
+
+                <div className="game-card bg-gradient-to-br from-pink-800/40 to-red-900/40 backdrop-blur-md p-6 rounded-xl border border-pink-500/30 hover:border-pink-400/50 transition-all">
+                  <div className="rounded-full bg-pink-600/30 w-14 h-14 flex items-center justify-center mb-4 mx-auto">
+                    <Gamepad className="text-pink-200 h-7 w-7" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Play</h3>
+                  <p className="text-pink-200 text-sm">Make learning finance fun with interactive games</p>
+                </div>
+              </div>
             </div>
             
-            <div className="mt-12 relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-              <Button
-                onClick={() => navigate("/lessons")}
-                className="relative px-8 py-6 text-lg font-medium text-white bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-700 rounded-full hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <BookOpen className="mr-2 h-5 w-5" />
-                Continue Learning
-              </Button>
-            </div>
+            <Button
+              onClick={() => navigate("/lessons")}
+              className="relative px-8 py-6 text-lg font-medium text-white bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 border border-purple-400/20 game-btn"
+            >
+              <Rocket className="mr-2 h-5 w-5" />
+              Continue Your Journey
+            </Button>
           </div>
         </div>
       </div>
     );
   }
 
+  // Render game-like homepage for non-authenticated users
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0d101e] to-[#162553] overflow-hidden relative">
       {/* Animated floating finance icons */}
@@ -140,63 +184,75 @@ const Index = () => {
               animationDelay: `${item.delay}s`,
             }}
           >
-            {item.icon}
+            {renderIcon(item.iconType, item.id)}
           </div>
         ))}
       </div>
       
-      <div className="container max-w-6xl mx-auto px-4 py-20 relative z-10">
-        <div className="flex flex-col min-h-[80vh] items-center justify-center">
-          <div className="text-center space-y-6 max-w-4xl">
-            <div className="mb-8">
-              <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-purple-400 via-pink-500 to-yellow-500">
-                FINZOW
-              </h1>
-              <p className="text-2xl sm:text-3xl lg:text-4xl text-gray-300 font-light">
-                Your Financial Playground
-              </p>
-            </div>
-            
-            <p className="text-gray-300 text-lg sm:text-xl max-w-3xl mx-auto mt-4">
-              Master your financial future through fun, interactive lessons and challenges.
-              Level up your wealth knowledge and unlock real-world money skills.
-            </p>
-            
-            <div className="mt-16 relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-              <Button 
-                onClick={() => navigate('/auth')}
-                className="relative px-10 py-8 text-xl font-bold tracking-wider text-white bg-gradient-to-br from-purple-500 via-indigo-600 to-blue-700 rounded-full hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 uppercase"
-              >
-                <Rocket className="mr-2 h-6 w-6" />
-                Start Your Adventure
-              </Button>
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Main hero section */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-20 text-center">
+          {/* Game logo area with glow effect */}
+          <div className="relative mb-6">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-75 animate-pulse"></div>
+            <div className="relative bg-gradient-to-br from-indigo-900 to-purple-900 rounded-full p-8">
+              <DollarSign className="h-16 w-16 text-purple-200" />
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-            <div className="p-6 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all hover:transform hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
+          {/* Title with animated gradient */}
+          <h1 className="text-8xl md:text-9xl font-extrabold mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-purple-400 via-pink-500 to-yellow-500 animate-pulse">
+            FINZOW
+          </h1>
+          
+          {/* Tagline */}
+          <p className="text-3xl md:text-4xl text-gray-300 font-light mb-8">
+            Your Financial Adventure Awaits
+          </p>
+          
+          {/* Description */}
+          <p className="max-w-2xl text-lg text-gray-400 mb-12">
+            Level up your money skills through interactive lessons, fun challenges, and real-world financial quests.
+          </p>
+          
+          {/* CTA Button with animated effect */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="relative px-10 py-6 text-xl font-bold text-white bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800 rounded-xl hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 uppercase game-btn"
+            >
+              <Rocket className="mr-2 h-6 w-6" />
+              Start Your Adventure
+            </Button>
+          </div>
+        </div>
+        
+        {/* Feature cards section */}
+        <div className="container mx-auto px-4 pb-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="game-card bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-white/20 transition-all">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mb-4">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Learn & Earn</h3>
-              <p className="text-gray-400">Earn rewards as you complete lessons and master financial concepts</p>
+              <h3 className="text-xl font-bold text-white mb-2">Level Up</h3>
+              <p className="text-gray-400">Gain XP and unlock achievements as you master financial concepts</p>
             </div>
             
-            <div className="p-6 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all hover:transform hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
+            <div className="game-card bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-white/20 transition-all">
               <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full flex items-center justify-center mb-4">
                 <DollarSign className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Real Skills</h3>
-              <p className="text-gray-400">Gain practical knowledge you can apply to your everyday financial decisions</p>
+              <p className="text-gray-400">Learn practical money management skills that apply to your everyday life</p>
             </div>
             
-            <div className="p-6 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all hover:transform hover:-translate-y-1 hover:shadow-xl hover:shadow-purple-500/10">
+            <div className="game-card bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-white/20 transition-all">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full flex items-center justify-center mb-4">
-                <BookOpen className="h-6 w-6 text-white" />
+                <Gamepad className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Fun Challenges</h3>
-              <p className="text-gray-400">Test your knowledge with interactive quizzes and engaging financial challenges</p>
+              <p className="text-gray-400">Compete in quests and challenges that make learning finance engaging</p>
             </div>
           </div>
         </div>
