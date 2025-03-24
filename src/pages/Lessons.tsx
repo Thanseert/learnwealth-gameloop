@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -16,6 +15,7 @@ interface Question {
   title: string;
   options: string[];
   correct_answer: string;
+  explanation?: string;
 }
 
 interface Lesson {
@@ -71,7 +71,8 @@ const fetchLessonsAndQuestions = async () => {
         id: q.id,
         title: q.title,
         options: q.options,
-        correctAnswer: q.correct_answer
+        correctAnswer: q.correct_answer,
+        explanation: q.explanation
       }))
   }));
 
@@ -196,7 +197,6 @@ const Lessons = () => {
           setTotalXP(updatedXP);
           setShowRewardAnimation(true);
           
-          // Hide the reward animation after 3 seconds
           setTimeout(() => {
             setShowRewardAnimation(false);
           }, 3000);
@@ -296,7 +296,8 @@ const Lessons = () => {
             question={{
               title: currentQuestion.title,
               options: currentQuestion.options,
-              correctAnswer: currentQuestion.correctAnswer
+              correctAnswer: currentQuestion.correctAnswer,
+              explanation: currentQuestion.explanation
             }}
             onComplete={handleQuizComplete}
             onClose={handleQuizClose}

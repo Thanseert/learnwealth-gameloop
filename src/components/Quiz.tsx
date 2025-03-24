@@ -1,16 +1,16 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Star, Check, X, SkipForward, ChevronRight } from "lucide-react";
+import { Star, Check, X, SkipForward, ChevronRight, Lightbulb } from "lucide-react";
 
 interface QuizProps {
   question: {
     title: string;
     options: string[];
     correctAnswer: string;
+    explanation?: string;
   };
   onComplete: (isCorrect: boolean) => void;
   onClose: () => void;
@@ -314,6 +314,17 @@ export function Quiz({ question, onComplete, onClose, currentQuestion, totalQues
           {isCorrect
             ? "🎉 Correct! Well done on completing this challenge!"
             : `❌ Incorrect. The correct answer is: ${question.correctAnswer}`}
+        </div>
+      )}
+
+      {/* Explanation Card - Show after submission */}
+      {hasSubmitted && question.explanation && (
+        <div className="mt-4 p-5 bg-blue-50 border border-blue-200 rounded-lg animate-fade-in">
+          <div className="flex items-center gap-2 text-blue-700 font-semibold mb-2">
+            <Lightbulb className="w-5 h-5" />
+            <h3>Explanation</h3>
+          </div>
+          <p className="text-blue-800">{question.explanation}</p>
         </div>
       )}
     </div>
