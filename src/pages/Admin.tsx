@@ -11,6 +11,7 @@ import QuestionForm from "@/components/admin/QuestionForm";
 import QuestionList from "@/components/admin/QuestionList";
 import LevelForm from "@/components/admin/LevelForm";
 import LevelList from "@/components/admin/LevelList";
+import AnalyticsDashboard from "@/components/admin/analytics/AnalyticsDashboard";
 
 interface Question {
   id: number;
@@ -50,7 +51,7 @@ const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [activeTab, setActiveTab] = useState<'questions' | 'levels'>('questions');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'questions' | 'levels'>('analytics');
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-data'],
@@ -114,6 +115,12 @@ const Admin = () => {
         {/* Tab navigation */}
         <div className="flex space-x-2 border-b pb-2">
           <Button 
+            variant={activeTab === 'analytics' ? 'default' : 'ghost'}
+            onClick={() => setActiveTab('analytics')}
+          >
+            Analytics Dashboard
+          </Button>
+          <Button 
             variant={activeTab === 'questions' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('questions')}
           >
@@ -129,6 +136,10 @@ const Admin = () => {
 
         {/* Tab content */}
         <div className="space-y-8">
+          {activeTab === 'analytics' && (
+            <AnalyticsDashboard />
+          )}
+
           {activeTab === 'questions' && (
             <>
               <QuestionForm
