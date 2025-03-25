@@ -71,6 +71,14 @@ const Index = () => {
     }
   };
 
+  const handleGetStarted = () => {
+    if (userData) {
+      navigate('/lessons');
+    } else {
+      navigate('/auth');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -114,15 +122,16 @@ const Index = () => {
               </p>
             </div>
             
-            {/* Primary CTA button with enhanced styling */}
-            <Button
-              onClick={() => navigate("/lessons")}
-              className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-fade-in flex items-center"
-              style={{ animationDelay: "0.4s" }}
-            >
-              <Rocket className="w-5 h-5 mr-2" />
-              Get started
-            </Button>
+            {/* Primary CTA button with enhanced styling and centered position */}
+            <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
+              <Button
+                onClick={handleGetStarted}
+                className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center"
+              >
+                <Rocket className="w-5 h-5 mr-2" />
+                Get started
+              </Button>
+            </div>
             
             {/* Secondary action button */}
             <div className="mt-8 animate-fade-in" style={{ animationDelay: "0.6s" }}>
@@ -177,15 +186,16 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Primary CTA button with enhanced styling */}
-          <Button
-            onClick={() => navigate("/auth")}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-fade-in flex items-center"
-            style={{ animationDelay: "0.4s" }}
-          >
-            <Rocket className="w-5 h-5 mr-2" />
-            Get started
-          </Button>
+          {/* Primary CTA button with enhanced styling and centered position */}
+          <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
+            <Button
+              onClick={handleGetStarted}
+              className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center"
+            >
+              <Rocket className="w-5 h-5 mr-2" />
+              Get started
+            </Button>
+          </div>
         </div>
       </div>
       
