@@ -85,43 +85,61 @@ const Index = () => {
       <div className="min-h-screen bg-white text-black overflow-hidden relative">
         {/* Navigation section with logo and logout */}
         <nav className="w-full flex justify-between items-center p-6">
-          <div className="text-2xl font-bold">Finzow</div>
+          <div className="text-2xl font-bold text-green-600">Finzow</div>
           <Button 
             variant="outline" 
             onClick={handleLogout} 
             className="rounded-full border-gray-200 text-gray-700 hover:bg-gray-100"
           >
+            <LogOut className="w-4 h-4 mr-2" />
             Log out
           </Button>
         </nav>
 
         {/* Main content */}
         <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
-          <div className="w-full max-w-4xl text-center space-y-5">
-            {/* Large heading similar to the reference */}
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+          <div className="w-full max-w-4xl text-center space-y-8">
+            {/* Large heading with gradient text */}
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
               Learn<br/>by doing
             </h1>
             
             {/* Subheadings */}
-            <div className="space-y-2 mt-6 mb-12">
-              <p className="text-xl md:text-2xl text-gray-800">
+            <div className="space-y-2 mt-8 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+              <p className="text-xl md:text-2xl text-gray-700">
                 Interactive financial problem solving that's effective and fun.
               </p>
-              <p className="text-xl md:text-2xl text-gray-800">
+              <p className="text-xl md:text-2xl text-gray-700">
                 Get smarter in 15 minutes a day.
               </p>
             </div>
             
-            {/* Primary CTA button */}
+            {/* Primary CTA button with enhanced styling */}
             <Button
               onClick={() => navigate("/lessons")}
-              className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-6 text-xl font-medium transition-all shadow-md"
+              className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-fade-in flex items-center"
+              style={{ animationDelay: "0.4s" }}
             >
+              <Rocket className="w-5 h-5 mr-2" />
               Get started
             </Button>
+            
+            {/* Secondary action button */}
+            <div className="mt-8 animate-fade-in" style={{ animationDelay: "0.6s" }}>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/lessons")}
+                className="text-gray-600 hover:text-gray-900 flex items-center"
+              >
+                <BookOpen className="w-5 h-5 mr-2" />
+                Browse lessons
+              </Button>
+            </div>
           </div>
         </div>
+        
+        {/* Subtle background decoration */}
+        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-green-50 to-transparent opacity-50"></div>
       </div>
     );
   }
@@ -131,7 +149,7 @@ const Index = () => {
     <div className="min-h-screen bg-white text-black overflow-hidden relative">
       {/* Navigation section with logo and login */}
       <nav className="w-full flex justify-between items-center p-6">
-        <div className="text-2xl font-bold">Finzow</div>
+        <div className="text-2xl font-bold text-green-600">Finzow</div>
         <Button 
           variant="outline" 
           onClick={() => navigate('/auth')} 
@@ -143,31 +161,36 @@ const Index = () => {
 
       {/* Main content */}
       <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
-        <div className="w-full max-w-4xl text-center space-y-5">
-          {/* Large heading similar to the reference */}
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight">
+        <div className="w-full max-w-4xl text-center space-y-8">
+          {/* Large heading with gradient text */}
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
             Learn<br/>by doing
           </h1>
           
           {/* Subheadings */}
-          <div className="space-y-2 mt-6 mb-12">
-            <p className="text-xl md:text-2xl text-gray-800">
+          <div className="space-y-2 mt-8 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <p className="text-xl md:text-2xl text-gray-700">
               Interactive financial problem solving that's effective and fun.
             </p>
-            <p className="text-xl md:text-2xl text-gray-800">
+            <p className="text-xl md:text-2xl text-gray-700">
               Get smarter in 15 minutes a day.
             </p>
           </div>
           
-          {/* Primary CTA button */}
+          {/* Primary CTA button with enhanced styling */}
           <Button
             onClick={() => navigate("/auth")}
-            className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-6 text-xl font-medium transition-all shadow-md"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 animate-fade-in flex items-center"
+            style={{ animationDelay: "0.4s" }}
           >
+            <Rocket className="w-5 h-5 mr-2" />
             Get started
           </Button>
         </div>
       </div>
+      
+      {/* Subtle background decoration */}
+      <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-green-50 to-transparent opacity-50"></div>
     </div>
   );
 };
