@@ -72,9 +72,12 @@ const Index = () => {
   };
 
   const handleGetStarted = () => {
+    console.log("Get started button clicked");
     if (userData) {
+      console.log("Navigating to /lessons");
       navigate('/lessons');
     } else {
+      console.log("Navigating to /auth");
       navigate('/auth');
     }
   };
@@ -126,7 +129,8 @@ const Index = () => {
             <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
               <Button
                 onClick={handleGetStarted}
-                className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center"
+                type="button"
+                className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center cursor-pointer z-10"
               >
                 <Rocket className="w-5 h-5 mr-2" />
                 Get started
@@ -138,7 +142,8 @@ const Index = () => {
               <Button
                 variant="ghost"
                 onClick={() => navigate("/lessons")}
-                className="text-gray-600 hover:text-gray-900 flex items-center"
+                type="button"
+                className="text-gray-600 hover:text-gray-900 flex items-center cursor-pointer z-10"
               >
                 <BookOpen className="w-5 h-5 mr-2" />
                 Browse lessons
@@ -162,7 +167,8 @@ const Index = () => {
         <Button 
           variant="outline" 
           onClick={() => navigate('/auth')} 
-          className="rounded-full border-gray-200 text-gray-700 hover:bg-gray-100"
+          type="button"
+          className="rounded-full border-gray-200 text-gray-700 hover:bg-gray-100 cursor-pointer z-10"
         >
           Log in
         </Button>
@@ -190,7 +196,8 @@ const Index = () => {
           <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <Button
               onClick={handleGetStarted}
-              className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center"
+              type="button"
+              className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center cursor-pointer z-10"
             >
               <Rocket className="w-5 h-5 mr-2" />
               Get started
