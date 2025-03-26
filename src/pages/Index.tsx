@@ -110,9 +110,9 @@ const Index = () => {
         {/* Main content */}
         <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
           <div className="w-full max-w-4xl text-center space-y-8">
-            {/* Large heading with gradient text */}
+            {/* Large heading with gradient text - UPDATED TEXT HERE */}
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
-              Learn<br/>by doing
+              Learn<br/>by playing
             </h1>
             
             {/* Subheadings */}
@@ -177,9 +177,9 @@ const Index = () => {
       {/* Main content */}
       <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
         <div className="w-full max-w-4xl text-center space-y-8">
-          {/* Large heading with gradient text */}
+          {/* Large heading with gradient text - UPDATED TEXT HERE */}
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
-            Learn<br/>by doing
+            Learn<br/>by playing
           </h1>
           
           {/* Subheadings */}
