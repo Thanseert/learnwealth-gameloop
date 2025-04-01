@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -136,19 +135,6 @@ const Index = () => {
               >
                 <Rocket className="w-5 h-5 mr-2" />
                 Get started
-              </Button>
-            </div>
-            
-            {/* Secondary action button */}
-            <div className="mt-8 animate-fade-in" style={{ animationDelay: "0.6s" }}>
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/lessons")}
-                type="button"
-                className="text-gray-600 hover:text-gray-900 flex items-center cursor-pointer z-10"
-              >
-                <BookOpen className="w-5 h-5 mr-2" />
-                Browse lessons
               </Button>
             </div>
           </div>
