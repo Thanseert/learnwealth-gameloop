@@ -110,14 +110,15 @@ const Index = () => {
         {/* Main content */}
         <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
           <div className="w-full max-w-4xl text-center space-y-8">
-            {/* Large heading with gradient text - UPDATED TEXT HERE */}
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in mb-16">
-              Learn<br className="block" />
-              <span className="block mt-4">by playing</span>
+            {/* Large heading with gradient text - ADJUSTED FOR VISIBILITY */}
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
+              Learn
+              <br className="block" />
+              <span className="block mt-6 mb-8 leading-tight">by playing</span>
             </h1>
             
-            {/* Subheadings - increased top margin with mt-20 */}
-            <div className="space-y-2 mt-20 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            {/* Subheadings - with proper margin to avoid overlap */}
+            <div className="space-y-2 mt-24 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
               <p className="text-xl md:text-2xl text-gray-700">
                 Interactive financial problem solving that's effective and fun.
               </p>
@@ -178,14 +179,15 @@ const Index = () => {
       {/* Main content */}
       <div className="container mx-auto px-4 py-10 flex flex-col items-center justify-center">
         <div className="w-full max-w-4xl text-center space-y-8">
-          {/* Large heading with gradient text - UPDATED TEXT HERE */}
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in mb-16">
-            Learn<br className="block" />
-            <span className="block mt-4">by playing</span>
+          {/* Large heading with gradient text - ADJUSTED FOR VISIBILITY */}
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent animate-fade-in">
+            Learn
+            <br className="block" />
+            <span className="block mt-6 mb-8 leading-tight">by playing</span>
           </h1>
           
-          {/* Subheadings - increased top margin with mt-20 */}
-          <div className="space-y-2 mt-20 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          {/* Subheadings - with proper margin to avoid overlap */}
+          <div className="space-y-2 mt-24 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <p className="text-xl md:text-2xl text-gray-700">
               Interactive financial problem solving that's effective and fun.
             </p>
