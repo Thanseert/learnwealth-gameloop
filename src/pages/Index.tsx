@@ -72,8 +72,7 @@ const Index = () => {
   };
 
   const handleGetStarted = () => {
-    console.log("Get started button clicked");
-    // Always redirect to auth page when Get Started is clicked
+    console.log("Get started button clicked from function");
     navigate('/auth');
   };
 
@@ -151,7 +150,6 @@ const Index = () => {
         <Button 
           variant="outline" 
           onClick={() => navigate('/auth')} 
-          type="button"
           className="rounded-full border-gray-200 text-gray-700 hover:bg-gray-100 cursor-pointer z-10"
         >
           Log in
@@ -181,10 +179,7 @@ const Index = () => {
           {/* Primary CTA button with enhanced styling and centered position */}
           <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <Button
-              onClick={() => {
-                console.log("Get started button clicked directly");
-                navigate('/auth');
-              }}
+              onClick={() => navigate('/auth')}
               type="button"
               className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center cursor-pointer z-10"
             >
