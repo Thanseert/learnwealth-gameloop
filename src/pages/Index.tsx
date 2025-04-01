@@ -72,13 +72,7 @@ const Index = () => {
 
   const handleGetStarted = () => {
     console.log("Get started button clicked");
-    if (userData) {
-      console.log("Navigating to /lessons");
-      navigate('/lessons');
-    } else {
-      console.log("Navigating to /auth");
-      navigate('/auth');
-    }
+    navigate('/auth');
   };
 
   if (isLoading) {
