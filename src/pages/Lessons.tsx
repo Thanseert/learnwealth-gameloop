@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { LessonContent } from "@/components/LessonContent";
@@ -19,6 +20,13 @@ interface Question {
   explanation?: string;
 }
 
+interface SubLesson {
+  id: number;
+  title: string;
+  content: string[];
+  questions: Question[];
+}
+
 interface Lesson {
   id: number;
   title: string;
@@ -27,8 +35,7 @@ interface Lesson {
   difficulty: "easy" | "medium" | "hard";
   isCompleted: boolean;
   progress?: number;
-  questions?: Question[];
-  content?: string[];
+  subLessons: SubLesson[];
 }
 
 interface CompletedLesson {
@@ -64,27 +71,135 @@ const fetchLessonsAndQuestions = async () => {
     }
   }
 
+  // Group questions by lesson_id
+  const questionsByLesson = questionsData.reduce((acc: {[key: number]: Question[]}, q: any) => {
+    if (!acc[q.lesson_id]) {
+      acc[q.lesson_id] = [];
+    }
+    acc[q.lesson_id].push({
+      id: q.id,
+      title: q.title,
+      options: q.options,
+      correctAnswer: q.correct_answer,
+      explanation: q.explanation
+    });
+    return acc;
+  }, {});
+
   const lessons = lessonsData.map((lesson: any) => ({
     ...lesson,
     isCompleted: completedLessonIds.includes(lesson.id),
-    questions: questionsData
-      .filter((q: any) => q.lesson_id === lesson.id)
-      .map((q: any) => ({
-        id: q.id,
-        title: q.title,
-        options: q.options,
-        correctAnswer: q.correct_answer,
-        explanation: q.explanation
-      }))
+    subLessons: createSubLessonsForLesson(lesson.id, questionsByLesson[lesson.id] || [])
   }));
 
   return lessons;
 };
 
+// Create sub-lessons for each lesson
+const createSubLessonsForLesson = (lessonId: number, questions: Question[]): SubLesson[] => {
+  const lessonContent = {
+    // Budgeting Basics
+    1: [
+      {
+        id: 1,
+        title: "Introduction to Budgeting",
+        content: [
+          "# Introduction to Budgeting\n\nBudgeting is the process of creating a plan for how you will spend your money. This spending plan is called a budget. Creating a budget allows you to determine in advance whether you will have enough money to do the things you need to do or would like to do.\n\nBudgeting is one of the most important financial habits you can develop.",
+          "# Why Budget?\n\n- Track exactly where your money is going\n- Identify and eliminate wasteful spending\n- Save for future goals like education, vacations or retirement\n- Reduce financial stress by knowing your financial situation\n- Avoid or get out of debt",
+          "# Creating a Basic Budget\n\n1. **Calculate your income**: Add up all sources of monthly income\n2. **Track your expenses**: List all your monthly expenses\n3. **Categorize spending**: Group expenses into categories like housing, food, transportation\n4. **Set goals**: Decide what you want to achieve financially"
+        ],
+        questions: questions.slice(0, 2)
+      },
+      {
+        id: 2,
+        title: "Creating Your First Budget",
+        content: [
+          "# Setting Up Your Budget\n\nNow that you understand why budgeting is important, let's learn how to create your first budget. There are several methods you can use, from simple pen-and-paper to spreadsheets or apps.\n\nThe key is finding a method that works for you and that you'll stick with consistently.",
+          "# The 50/30/20 Budget Rule\n\nOne popular budgeting method is the 50/30/20 rule:\n\n- 50% of your income goes to needs (housing, food, utilities)\n- 30% goes to wants (entertainment, dining out, hobbies)\n- 20% goes to savings and debt repayment",
+          "# Common Budgeting Mistakes\n\n- Not tracking small expenses that add up\n- Setting unrealistic goals\n- Not updating your budget regularly\n- Forgetting about irregular expenses\n- Not building in fun money (which leads to budget abandonment)"
+        ],
+        questions: questions.slice(2, 4)
+      }
+    ],
+    // Saving Strategies
+    2: [
+      {
+        id: 3,
+        title: "Emergency Fund Basics",
+        content: [
+          "# Understanding Savings\n\nSaving money is one of the most important aspects of building wealth and having a secure financial foundation. The earlier you start saving, the better off you'll be due to the power of compound interest.",
+          "# The Emergency Fund\n\nAn emergency fund is money specifically set aside for unexpected expenses or financial emergencies. Most financial experts recommend having 3-6 months of essential expenses saved in an emergency fund.\n\nThis provides a financial buffer that keeps you from relying on credit cards or high-interest loans when unexpected costs arise.",
+          "# Building Your Emergency Fund\n\nStart small with a goal of $1,000, then work toward 1 month of expenses, and eventually 3-6 months.\n\nKeep your emergency fund in a high-yield savings account that is easily accessible but separate from your everyday checking account."
+        ],
+        questions: questions.slice(0, 2)
+      },
+      {
+        id: 4,
+        title: "Advanced Saving Techniques",
+        content: [
+          "# Savings Strategies\n\n- **Pay yourself first**: Set aside savings at the beginning of the month\n- **Automate transfers**: Schedule automatic transfers to savings accounts\n- **Save windfalls**: Put tax refunds, bonuses, or gifts into savings\n- **Use the 50/30/20 rule**: Allocate 50% of your budget to needs, 30% to wants, and 20% to savings",
+          "# Saving for Specific Goals\n\nBeyond your emergency fund, consider saving for specific goals like:\n\n- Down payment on a home\n- Vacation\n- Education\n- Retirement\n- Major purchases",
+          "# Making Your Money Work Harder\n\nOnce you have an emergency fund established, consider different savings vehicles for different goals:\n\n- High-yield savings accounts for short-term goals\n- Certificates of Deposit (CDs) for medium-term goals\n- Investment accounts for long-term goals"
+        ],
+        questions: questions.slice(2, 4)
+      }
+    ],
+    // Debt Management
+    3: [
+      {
+        id: 5,
+        title: "Understanding Debt",
+        content: [
+          "# Debt Management Basics\n\nDebt isn't inherently bad - it's a tool that can help you achieve goals when used wisely. However, poor debt management can lead to financial problems that may take years to overcome.",
+          "# Types of Debt\n\n- **Good debt**: Potentially increases your net worth or generates income (e.g., mortgages, student loans, business loans)\n- **Bad debt**: Doesn't increase your wealth or generate income (e.g., credit cards, payday loans, auto loans)\n\nEven \"good debt\" becomes bad if you take on more than you can afford.",
+          "# Understanding Interest and Fees\n\nInterest is the cost of borrowing money, expressed as a percentage. The Annual Percentage Rate (APR) includes both interest and fees.\n\nCompound interest works against you with debt - you pay interest on both the principal and accumulated interest."
+        ],
+        questions: questions.slice(0, 2)
+      },
+      {
+        id: 6,
+        title: "Debt Repayment Strategies",
+        content: [
+          "# Strategies for Paying Off Debt\n\n- **Debt Avalanche**: Focus on high-interest debt first while paying minimum on others\n- **Debt Snowball**: Pay off smallest balances first for psychological wins\n- **Debt Consolidation**: Combine multiple debts into a single loan with better terms\n- **Balance Transfers**: Move high-interest credit card debt to cards with 0% intro rates",
+          "# Avoiding Debt Pitfalls\n\n- Always pay more than the minimum payment\n- Understand the terms before taking on new debt\n- Read the fine print on all financial agreements\n- Avoid payday loans and high-interest products\n- Consider if a purchase is a want or a need before using credit",
+          "# Getting Help with Debt\n\nIf you're struggling with debt:\n\n- Contact creditors to discuss hardship options\n- Consider credit counseling from a non-profit agency\n- Learn about consumer protection laws\n- Research debt consolidation or management programs"
+        ],
+        questions: questions.slice(2, 4)
+      }
+    ]
+  };
+  
+  // Return default sub-lessons if the lesson content doesn't exist
+  if (!lessonContent[lessonId as keyof typeof lessonContent]) {
+    return [
+      {
+        id: lessonId * 100,
+        title: "Introduction",
+        content: [
+          "# Default Lesson Content\n\nThis lesson content is still being developed. Check back soon for updates!",
+          "# Coming Soon\n\nWe're working on creating engaging content for this lesson."
+        ],
+        questions: questions.slice(0, Math.min(5, questions.length))
+      },
+      {
+        id: lessonId * 100 + 1,
+        title: "Advanced Concepts",
+        content: [
+          "# Advanced Concepts\n\nThis section will cover more in-depth topics related to this lesson.",
+          "# Stay Tuned\n\nMore content is being developed for this section."
+        ],
+        questions: questions.slice(Math.min(5, questions.length), questions.length)
+      }
+    ];
+  }
+  
+  return lessonContent[lessonId as keyof typeof lessonContent];
+};
+
 const Lessons = () => {
   const navigate = useNavigate();
   const [totalXP, setTotalXP] = useState(0);
-  const [activeQuiz, setActiveQuiz] = useState<number | null>(null);
+  const [activeQuiz, setActiveQuiz] = useState<{lessonId: number, subLessonId: number} | null>(null);
   const [activeLessonContent, setActiveLessonContent] = useState<number | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
@@ -94,8 +209,6 @@ const Lessons = () => {
     queryKey: ['lessons'],
     queryFn: fetchLessonsAndQuestions
   });
-
-  const [completedLessons, setCompletedLessons] = useState<Lesson[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -137,17 +250,19 @@ const Lessons = () => {
     const lesson = lessons.find(l => l.id === lessonId);
     if (!lesson) return;
     
-    // Instead of directly starting the quiz, show lesson content first
     setActiveLessonContent(lessonId);
   };
 
-  const handleStartQuiz = () => {
+  const handleStartQuiz = (subLessonId: number) => {
     const lessonId = activeLessonContent;
     if (!lessonId) return;
     
     const lesson = lessons.find(l => l.id === lessonId);
-    if (lesson?.questions && lesson.questions.length > 0) {
-      setActiveQuiz(lessonId);
+    if (!lesson) return;
+    
+    const subLesson = lesson.subLessons.find(sl => sl.id === subLessonId);
+    if (subLesson?.questions && subLesson.questions.length > 0) {
+      setActiveQuiz({ lessonId, subLessonId });
       setActiveLessonContent(null);
       setCurrentQuestionIndex(0);
     } else {
@@ -156,17 +271,23 @@ const Lessons = () => {
   };
 
   const handleQuizComplete = async (isCorrect: boolean) => {
-    if (isCorrect && userId) {
+    if (!activeQuiz || !userId) return;
+    
+    if (isCorrect) {
       try {
-        const activeLesson = lessons.find(l => l.id === activeQuiz);
+        const activeLesson = lessons.find(l => l.id === activeQuiz.lessonId);
         if (!activeLesson) return;
         
-        const isLessonAlreadyCompleted = activeLesson.isCompleted;
+        const subLesson = activeLesson.subLessons.find(sl => sl.id === activeQuiz.subLessonId);
+        if (!subLesson) return;
         
-        if (activeLesson?.questions && currentQuestionIndex < activeLesson.questions.length - 1) {
+        if (subLesson.questions && currentQuestionIndex < subLesson.questions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1);
           return;
         }
+        
+        // Check if lesson is already completed
+        const isLessonAlreadyCompleted = activeLesson.isCompleted;
         
         if (!isLessonAlreadyCompleted) {
           const earnedXP = activeLesson.xp || 5;
@@ -273,41 +394,15 @@ const Lessons = () => {
     );
   }
 
-  const activeLesson = lessons.find(l => l.id === activeQuiz || l.id === activeLessonContent);
-  const currentQuestion = activeLesson?.questions?.[currentQuestionIndex];
-
-  // Sample lesson content - in a real app this would come from the database
-  const lessonContent = {
-    1: [
-      "# Introduction to Budgeting\n\nBudgeting is the process of creating a plan for how you will spend your money. This spending plan is called a budget. Creating a budget allows you to determine in advance whether you will have enough money to do the things you need to do or would like to do.\n\nBudgeting is one of the most important financial habits you can develop.",
-      "# Why Budget?\n\n- Track exactly where your money is going\n- Identify and eliminate wasteful spending\n- Save for future goals like education, vacations or retirement\n- Reduce financial stress by knowing your financial situation\n- Avoid or get out of debt",
-      "# Creating a Basic Budget\n\n1. **Calculate your income**: Add up all sources of monthly income\n2. **Track your expenses**: List all your monthly expenses\n3. **Categorize spending**: Group expenses into categories like housing, food, transportation\n4. **Set goals**: Decide what you want to achieve financially"
-    ],
-    2: [
-      "# Understanding Savings\n\nSaving money is one of the most important aspects of building wealth and having a secure financial foundation. The earlier you start saving, the better off you'll be due to the power of compound interest.",
-      "# The Emergency Fund\n\nAn emergency fund is money specifically set aside for unexpected expenses or financial emergencies. Most financial experts recommend having 3-6 months of essential expenses saved in an emergency fund.\n\nThis provides a financial buffer that keeps you from relying on credit cards or high-interest loans when unexpected costs arise.",
-      "# Savings Strategies\n\n- **Pay yourself first**: Set aside savings at the beginning of the month\n- **Automate transfers**: Schedule automatic transfers to savings accounts\n- **Save windfalls**: Put tax refunds, bonuses, or gifts into savings\n- **Use the 50/30/20 rule**: Allocate 50% of your budget to needs, 30% to wants, and 20% to savings"
-    ],
-    3: [
-      "# Debt Management Basics\n\nDebt isn't inherently bad - it's a tool that can help you achieve goals when used wisely. However, poor debt management can lead to financial problems that may take years to overcome.",
-      "# Types of Debt\n\n- **Good debt**: Potentially increases your net worth or generates income (e.g., mortgages, student loans, business loans)\n- **Bad debt**: Doesn't increase your wealth or generate income (e.g., credit cards, payday loans, auto loans)\n\nEven \"good debt\" becomes bad if you take on more than you can afford.",
-      "# Strategies for Paying Off Debt\n\n- **Debt Avalanche**: Focus on high-interest debt first while paying minimum on others\n- **Debt Snowball**: Pay off smallest balances first for psychological wins\n- **Debt Consolidation**: Combine multiple debts into a single loan with better terms\n- **Balance Transfers**: Move high-interest credit card debt to cards with 0% intro rates"
-    ]
-  };
-
-  // Add content to lessons
-  const lessonsWithContent = lessons.map((lesson) => {
-    return {
-      ...lesson,
-      content: lessonContent[lesson.id as keyof typeof lessonContent] || [
-        "# Default Lesson Content\n\nThis lesson content is still being developed. Check back soon for updates!",
-        "# Coming Soon\n\nWe're working on creating engaging content for this lesson. In the meantime, here are some general financial tips:\n\n- Track your spending\n- Create emergency savings\n- Pay off high-interest debt first\n- Invest early and consistently"
-      ]
-    };
-  });
-
-  // Find the active lesson with content
-  const activeLessonWithContent = lessonsWithContent.find(l => l.id === activeLessonContent);
+  const activeLesson = lessons.find(l => l.id === activeLessonContent || (activeQuiz && l.id === activeQuiz.lessonId));
+  let currentQuestion: Question | undefined;
+  
+  if (activeQuiz && activeLesson) {
+    const subLesson = activeLesson.subLessons.find(sl => sl.id === activeQuiz.subLessonId);
+    if (subLesson) {
+      currentQuestion = subLesson.questions[currentQuestionIndex];
+    }
+  }
 
   const completedLessonsCount = lessons.filter(lesson => lesson.isCompleted).length;
   const totalLessonsCount = lessons.length;
@@ -354,9 +449,9 @@ const Lessons = () => {
             onComplete={handleQuizComplete}
             onClose={handleQuizClose}
             currentQuestion={currentQuestionIndex + 1}
-            totalQuestions={activeLesson?.questions?.length || 0}
+            totalQuestions={activeLesson?.subLessons.find(sl => sl.id === activeQuiz.subLessonId)?.questions.length || 0}
           />
-        ) : activeLessonContent && activeLessonWithContent ? (
+        ) : activeLessonContent && activeLesson ? (
           <div>
             <div className="flex items-center mb-6">
               <Button
@@ -371,11 +466,12 @@ const Lessons = () => {
             </div>
             
             <LessonContent
-              title={activeLessonWithContent.title}
-              description={activeLessonWithContent.description}
-              difficulty={activeLessonWithContent.difficulty}
-              content={activeLessonWithContent.content || []}
+              title={activeLesson.title}
+              description={activeLesson.description}
+              difficulty={activeLesson.difficulty}
+              subLessons={activeLesson.subLessons}
               onStartQuiz={handleStartQuiz}
+              onBack={handleLessonClose}
             />
           </div>
         ) : (
@@ -429,7 +525,7 @@ const Lessons = () => {
                 </div>
 
                 <div className="space-y-8">
-                  {lessonsWithContent.map((lesson, index) => (
+                  {lessons.map((lesson, index) => (
                     <LessonCard
                       key={lesson.id}
                       title={lesson.title}
@@ -437,12 +533,12 @@ const Lessons = () => {
                       xp={lesson.xp}
                       difficulty={lesson.difficulty}
                       isCompleted={lesson.isCompleted}
-                      onClick={() => handleLessonClick(lesson.id, index > 0 && !lessonsWithContent[index - 1].isCompleted)}
+                      onClick={() => handleLessonClick(lesson.id, index > 0 && !lessons[index - 1].isCompleted)}
                       number={index + 1}
                       progress={lesson.isCompleted ? 100 : 0}
-                      isLocked={index > 0 && !lessonsWithContent[index - 1].isCompleted}
-                      isLast={index === lessonsWithContent.length - 1}
-                      questionsCount={lesson.questions?.length || 0}
+                      isLocked={index > 0 && !lessons[index - 1].isCompleted}
+                      isLast={index === lessons.length - 1}
+                      questionsCount={lesson.subLessons.reduce((total, subLesson) => total + subLesson.questions.length, 0)}
                     />
                   ))}
                 </div>
