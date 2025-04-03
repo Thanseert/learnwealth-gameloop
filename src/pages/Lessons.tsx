@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
+import { LessonContent } from "@/components/LessonContent";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Trophy, Coins, ArrowLeft, Award, Star, Gift } from "lucide-react";
 import { Quiz } from "@/components/Quiz";
@@ -14,7 +15,7 @@ interface Question {
   id: number;
   title: string;
   options: string[];
-  correct_answer: string;
+  correctAnswer: string;
   explanation?: string;
 }
 
@@ -27,6 +28,7 @@ interface Lesson {
   isCompleted: boolean;
   progress?: number;
   questions?: Question[];
+  content?: string[];
 }
 
 interface CompletedLesson {
@@ -83,6 +85,7 @@ const Lessons = () => {
   const navigate = useNavigate();
   const [totalXP, setTotalXP] = useState(0);
   const [activeQuiz, setActiveQuiz] = useState<number | null>(null);
+  const [activeLessonContent, setActiveLessonContent] = useState<number | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [showRewardAnimation, setShowRewardAnimation] = useState(false);
@@ -132,8 +135,20 @@ const Lessons = () => {
     }
     
     const lesson = lessons.find(l => l.id === lessonId);
+    if (!lesson) return;
+    
+    // Instead of directly starting the quiz, show lesson content first
+    setActiveLessonContent(lessonId);
+  };
+
+  const handleStartQuiz = () => {
+    const lessonId = activeLessonContent;
+    if (!lessonId) return;
+    
+    const lesson = lessons.find(l => l.id === lessonId);
     if (lesson?.questions && lesson.questions.length > 0) {
       setActiveQuiz(lessonId);
+      setActiveLessonContent(null);
       setCurrentQuestionIndex(0);
     } else {
       toast.error('No questions available for this lesson');
@@ -227,6 +242,10 @@ const Lessons = () => {
     setCurrentQuestionIndex(0);
   };
 
+  const handleLessonClose = () => {
+    setActiveLessonContent(null);
+  };
+
   const calculateLevelProgress = () => {
     const xpPerLevel = 50;
     const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
@@ -254,8 +273,41 @@ const Lessons = () => {
     );
   }
 
-  const activeLesson = lessons.find(l => l.id === activeQuiz);
+  const activeLesson = lessons.find(l => l.id === activeQuiz || l.id === activeLessonContent);
   const currentQuestion = activeLesson?.questions?.[currentQuestionIndex];
+
+  // Sample lesson content - in a real app this would come from the database
+  const lessonContent = {
+    1: [
+      "# Introduction to Budgeting\n\nBudgeting is the process of creating a plan for how you will spend your money. This spending plan is called a budget. Creating a budget allows you to determine in advance whether you will have enough money to do the things you need to do or would like to do.\n\nBudgeting is one of the most important financial habits you can develop.",
+      "# Why Budget?\n\n- Track exactly where your money is going\n- Identify and eliminate wasteful spending\n- Save for future goals like education, vacations or retirement\n- Reduce financial stress by knowing your financial situation\n- Avoid or get out of debt",
+      "# Creating a Basic Budget\n\n1. **Calculate your income**: Add up all sources of monthly income\n2. **Track your expenses**: List all your monthly expenses\n3. **Categorize spending**: Group expenses into categories like housing, food, transportation\n4. **Set goals**: Decide what you want to achieve financially"
+    ],
+    2: [
+      "# Understanding Savings\n\nSaving money is one of the most important aspects of building wealth and having a secure financial foundation. The earlier you start saving, the better off you'll be due to the power of compound interest.",
+      "# The Emergency Fund\n\nAn emergency fund is money specifically set aside for unexpected expenses or financial emergencies. Most financial experts recommend having 3-6 months of essential expenses saved in an emergency fund.\n\nThis provides a financial buffer that keeps you from relying on credit cards or high-interest loans when unexpected costs arise.",
+      "# Savings Strategies\n\n- **Pay yourself first**: Set aside savings at the beginning of the month\n- **Automate transfers**: Schedule automatic transfers to savings accounts\n- **Save windfalls**: Put tax refunds, bonuses, or gifts into savings\n- **Use the 50/30/20 rule**: Allocate 50% of your budget to needs, 30% to wants, and 20% to savings"
+    ],
+    3: [
+      "# Debt Management Basics\n\nDebt isn't inherently bad - it's a tool that can help you achieve goals when used wisely. However, poor debt management can lead to financial problems that may take years to overcome.",
+      "# Types of Debt\n\n- **Good debt**: Potentially increases your net worth or generates income (e.g., mortgages, student loans, business loans)\n- **Bad debt**: Doesn't increase your wealth or generate income (e.g., credit cards, payday loans, auto loans)\n\nEven \"good debt\" becomes bad if you take on more than you can afford.",
+      "# Strategies for Paying Off Debt\n\n- **Debt Avalanche**: Focus on high-interest debt first while paying minimum on others\n- **Debt Snowball**: Pay off smallest balances first for psychological wins\n- **Debt Consolidation**: Combine multiple debts into a single loan with better terms\n- **Balance Transfers**: Move high-interest credit card debt to cards with 0% intro rates"
+    ]
+  };
+
+  // Add content to lessons
+  const lessonsWithContent = lessons.map((lesson) => {
+    return {
+      ...lesson,
+      content: lessonContent[lesson.id as keyof typeof lessonContent] || [
+        "# Default Lesson Content\n\nThis lesson content is still being developed. Check back soon for updates!",
+        "# Coming Soon\n\nWe're working on creating engaging content for this lesson. In the meantime, here are some general financial tips:\n\n- Track your spending\n- Create emergency savings\n- Pay off high-interest debt first\n- Invest early and consistently"
+      ]
+    };
+  });
+
+  // Find the active lesson with content
+  const activeLessonWithContent = lessonsWithContent.find(l => l.id === activeLessonContent);
 
   const completedLessonsCount = lessons.filter(lesson => lesson.isCompleted).length;
   const totalLessonsCount = lessons.length;
@@ -304,6 +356,28 @@ const Lessons = () => {
             currentQuestion={currentQuestionIndex + 1}
             totalQuestions={activeLesson?.questions?.length || 0}
           />
+        ) : activeLessonContent && activeLessonWithContent ? (
+          <div>
+            <div className="flex items-center mb-6">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLessonClose}
+                className="hover:bg-purple-100 text-purple-800"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <h1 className="text-2xl font-bold text-purple-900 ml-2">Back to Lessons</h1>
+            </div>
+            
+            <LessonContent
+              title={activeLessonWithContent.title}
+              description={activeLessonWithContent.description}
+              difficulty={activeLessonWithContent.difficulty}
+              content={activeLessonWithContent.content || []}
+              onStartQuiz={handleStartQuiz}
+            />
+          </div>
         ) : (
           <>
             <div className="flex items-center justify-between mb-8">
@@ -355,7 +429,7 @@ const Lessons = () => {
                 </div>
 
                 <div className="space-y-8">
-                  {lessons.map((lesson, index) => (
+                  {lessonsWithContent.map((lesson, index) => (
                     <LessonCard
                       key={lesson.id}
                       title={lesson.title}
@@ -363,11 +437,11 @@ const Lessons = () => {
                       xp={lesson.xp}
                       difficulty={lesson.difficulty}
                       isCompleted={lesson.isCompleted}
-                      onClick={() => handleLessonClick(lesson.id, index > 0 && !lessons[index - 1].isCompleted)}
+                      onClick={() => handleLessonClick(lesson.id, index > 0 && !lessonsWithContent[index - 1].isCompleted)}
                       number={index + 1}
                       progress={lesson.isCompleted ? 100 : 0}
-                      isLocked={index > 0 && !lessons[index - 1].isCompleted}
-                      isLast={index === lessons.length - 1}
+                      isLocked={index > 0 && !lessonsWithContent[index - 1].isCompleted}
+                      isLast={index === lessonsWithContent.length - 1}
                       questionsCount={lesson.questions?.length || 0}
                     />
                   ))}
