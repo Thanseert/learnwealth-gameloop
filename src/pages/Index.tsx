@@ -72,7 +72,7 @@ const Index = () => {
   };
 
   const handleGetStarted = () => {
-    console.log("Get started button clicked from function");
+    console.log("Get started button clicked");
     navigate('/auth');
   };
 
@@ -124,12 +124,12 @@ const Index = () => {
             {/* Primary CTA button with enhanced styling and centered position */}
             <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
               <Button
-                onClick={handleGetStarted}
+                onClick={() => navigate('/lessons')}
                 type="button"
                 className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center cursor-pointer z-10"
               >
-                <Rocket className="w-5 h-5 mr-2" />
-                Get started
+                <BookOpen className="w-5 h-5 mr-2" />
+                Go to Lessons
               </Button>
             </div>
           </div>
@@ -179,7 +179,7 @@ const Index = () => {
           {/* Primary CTA button with enhanced styling and centered position */}
           <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <Button
-              onClick={() => navigate('/auth')}
+              onClick={handleGetStarted}
               type="button"
               className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center cursor-pointer z-10"
             >

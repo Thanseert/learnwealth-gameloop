@@ -43,7 +43,7 @@ export default function Auth() {
         });
         
         if (error) throw error;
-        navigate("/");
+        navigate("/lessons");
       }
     } catch (error: any) {
       toast.error(error.message);

@@ -71,18 +71,14 @@ const App = () => {
             <Route
               path="/"
               element={
-                isAuthenticated ? (
-                  <Index />
-                ) : (
-                  <Index />
-                )
+                <Index />
               }
             />
             <Route
               path="/auth"
               element={
                 isAuthenticated ? (
-                  <Navigate to="/" replace />
+                  <Navigate to="/lessons" replace />
                 ) : (
                   <Auth />
                 )
