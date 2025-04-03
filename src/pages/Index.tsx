@@ -179,7 +179,7 @@ const Index = () => {
           {/* Primary CTA button with enhanced styling and centered position */}
           <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
             <Button
-              onClick={handleGetStarted}
+              onClick={() => navigate('/auth')}
               type="button"
               className="bg-green-500 hover:bg-green-600 text-white rounded-full px-12 py-8 text-xl font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center cursor-pointer z-10"
             >
