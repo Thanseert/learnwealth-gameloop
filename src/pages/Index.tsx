@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -114,7 +113,7 @@ const Index = () => {
             {/* Subheadings - with proper margin to avoid overlap */}
             <div className="space-y-2 mt-24 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
               <p className="text-xl md:text-2xl text-gray-700">
-                Interactive financial problem solving that's effective and fun.
+                Finzow is where the next generation learns finance—by playing.
               </p>
               <p className="text-xl md:text-2xl text-gray-700">
                 Get smarter in 15 minutes a day.
@@ -169,7 +168,7 @@ const Index = () => {
           {/* Subheadings - with proper margin to avoid overlap */}
           <div className="space-y-2 mt-24 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <p className="text-xl md:text-2xl text-gray-700">
-              Interactive financial problem solving that's effective and fun.
+              Finzow is where the next generation learns finance—by playing.
             </p>
             <p className="text-xl md:text-2xl text-gray-700">
               Get smarter in 15 minutes a day.
