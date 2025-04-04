@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { LessonContent } from "@/components/LessonContent";
@@ -71,7 +70,6 @@ const fetchLessonsAndQuestions = async () => {
     }
   }
 
-  // Group questions by lesson_id
   const questionsByLesson = questionsData.reduce((acc: {[key: number]: Question[]}, q: any) => {
     if (!acc[q.lesson_id]) {
       acc[q.lesson_id] = [];
@@ -95,10 +93,8 @@ const fetchLessonsAndQuestions = async () => {
   return lessons;
 };
 
-// Create sub-lessons for each lesson
 const createSubLessonsForLesson = (lessonId: number, questions: Question[]): SubLesson[] => {
   const lessonContent = {
-    // Budgeting Basics
     1: [
       {
         id: 1,
@@ -121,7 +117,6 @@ const createSubLessonsForLesson = (lessonId: number, questions: Question[]): Sub
         questions: questions.slice(2, 4)
       }
     ],
-    // Saving Strategies
     2: [
       {
         id: 3,
@@ -144,7 +139,6 @@ const createSubLessonsForLesson = (lessonId: number, questions: Question[]): Sub
         questions: questions.slice(2, 4)
       }
     ],
-    // Debt Management
     3: [
       {
         id: 5,
@@ -168,8 +162,7 @@ const createSubLessonsForLesson = (lessonId: number, questions: Question[]): Sub
       }
     ]
   };
-  
-  // Return default sub-lessons if the lesson content doesn't exist
+
   if (!lessonContent[lessonId as keyof typeof lessonContent]) {
     return [
       {
@@ -286,7 +279,6 @@ const Lessons = () => {
           return;
         }
         
-        // Check if lesson is already completed
         const isLessonAlreadyCompleted = activeLesson.isCompleted;
         
         if (!isLessonAlreadyCompleted) {
@@ -413,7 +405,6 @@ const Lessons = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       <div className="container py-8 space-y-8 animate-fade-in max-w-4xl mx-auto">
-        {/* XP Reward Animation */}
         {showRewardAnimation && (
           <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
             <div className="relative">
@@ -469,7 +460,7 @@ const Lessons = () => {
               title={activeLesson.title}
               description={activeLesson.description}
               difficulty={activeLesson.difficulty}
-              subLessons={activeLesson.subLessons}
+              lessonId={activeLesson.id}
               onStartQuiz={handleStartQuiz}
               onBack={handleLessonClose}
             />

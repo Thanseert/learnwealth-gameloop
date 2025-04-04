@@ -16,7 +16,7 @@ interface LessonContentProps {
   title: string;
   description: string;
   difficulty: "easy" | "medium" | "hard";
-  lessonId: number; // Added to fetch sub-lessons from database
+  lessonId: number; // Used to fetch sub-lessons from database
   onStartQuiz: (subLessonId: number) => void;
   onBack: () => void;
 }
