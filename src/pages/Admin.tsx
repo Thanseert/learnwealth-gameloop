@@ -12,6 +12,8 @@ import QuestionList from "@/components/admin/QuestionList";
 import LevelForm from "@/components/admin/LevelForm";
 import LevelList from "@/components/admin/LevelList";
 import AnalyticsDashboard from "@/components/admin/analytics/AnalyticsDashboard";
+import LessonContentForm from "@/components/admin/LessonContentForm";
+import LessonContentList from "@/components/admin/LessonContentList";
 
 interface Question {
   id: number;
@@ -41,8 +43,19 @@ const fetchLessonsAndQuestions = async () => {
     .select('*');
 
   if (questionsError) throw questionsError;
+  
+  // Fetch lesson content
+  const { data: lessonContentData, error: lessonContentError } = await supabase
+    .from('lesson_content')
+    .select('*');
+    
+  if (lessonContentError) throw lessonContentError;
 
-  return { lessons: lessonsData, questions: questionsData };
+  return { 
+    lessons: lessonsData, 
+    questions: questionsData, 
+    lessonContent: lessonContentData || [] 
+  };
 };
 
 const Admin = () => {
@@ -51,7 +64,7 @@ const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'questions' | 'levels'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'questions' | 'levels' | 'content'>('analytics');
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-data'],
@@ -94,6 +107,7 @@ const Admin = () => {
 
   const lessons = data?.lessons || [];
   const questions = data?.questions || [];
+  const lessonContent = data?.lessonContent || [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -132,6 +146,12 @@ const Admin = () => {
           >
             Manage Levels
           </Button>
+          <Button 
+            variant={activeTab === 'content' ? 'default' : 'ghost'}
+            onClick={() => setActiveTab('content')}
+          >
+            Manage Lesson Content
+          </Button>
         </div>
 
         {/* Tab content */}
@@ -163,6 +183,21 @@ const Admin = () => {
               <LevelForm onLevelAdded={refetch} />
               
               <LevelList lessons={lessons} onLevelDeleted={refetch} />
+            </>
+          )}
+          
+          {activeTab === 'content' && (
+            <>
+              <LessonContentForm 
+                lessons={lessons} 
+                onContentUpdated={refetch}
+              />
+              
+              <LessonContentList 
+                lessonContent={lessonContent} 
+                lessons={lessons} 
+                onContentDeleted={refetch} 
+              />
             </>
           )}
         </div>

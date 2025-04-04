@@ -1,9 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronRight, BookOpen, Star, ListTodo } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SubLesson {
   id: number;
@@ -15,7 +16,7 @@ interface LessonContentProps {
   title: string;
   description: string;
   difficulty: "easy" | "medium" | "hard";
-  subLessons: SubLesson[];
+  lessonId: number; // Added to fetch sub-lessons from database
   onStartQuiz: (subLessonId: number) => void;
   onBack: () => void;
 }
@@ -24,12 +25,37 @@ export function LessonContent({
   title,
   description,
   difficulty,
-  subLessons,
+  lessonId,
   onStartQuiz,
   onBack,
 }: LessonContentProps) {
   const [selectedSubLesson, setSelectedSubLesson] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [subLessons, setSubLessons] = useState<SubLesson[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchSubLessons = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('lesson_content')
+          .select('id, title, content, order')
+          .eq('lesson_id', lessonId)
+          .order('order');
+          
+        if (error) throw error;
+        
+        setSubLessons(data || []);
+      } catch (err) {
+        console.error('Error fetching sub-lessons:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchSubLessons();
+  }, [lessonId]);
   
   const getDifficultyColor = () => {
     switch (difficulty) {
@@ -80,6 +106,10 @@ export function LessonContent({
     setCurrentPage(0);
   };
 
+  if (loading) {
+    return <div className="min-h-[70vh] flex items-center justify-center">Loading lesson content...</div>;
+  }
+
   // If no sub-lesson is selected, show the list of sub-lessons
   if (selectedSubLesson === null) {
     return (
@@ -103,23 +133,30 @@ export function LessonContent({
         
         <p className="mb-6 text-gray-600">{description}</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {subLessons.map((subLesson) => (
-            <Card 
-              key={subLesson.id} 
-              className="p-6 hover:shadow-md transition-shadow cursor-pointer bg-white border border-purple-100"
-              onClick={() => handleSelectSubLesson(subLesson.id)}
-            >
-              <div className="flex items-center gap-3">
-                <ListTodo className="h-6 w-6 text-purple-600" />
-                <h3 className="font-semibold text-lg">{subLesson.title}</h3>
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                {subLesson.content.length} {subLesson.content.length === 1 ? 'page' : 'pages'}
-              </p>
-            </Card>
-          ))}
-        </div>
+        {subLessons.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10">
+            <p className="text-gray-500 mb-4">No lesson content available yet.</p>
+            <Button onClick={onBack}>Back to Lessons</Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {subLessons.map((subLesson) => (
+              <Card 
+                key={subLesson.id} 
+                className="p-6 hover:shadow-md transition-shadow cursor-pointer bg-white border border-purple-100"
+                onClick={() => handleSelectSubLesson(subLesson.id)}
+              >
+                <div className="flex items-center gap-3">
+                  <ListTodo className="h-6 w-6 text-purple-600" />
+                  <h3 className="font-semibold text-lg">{subLesson.title}</h3>
+                </div>
+                <p className="mt-2 text-sm text-gray-500">
+                  {subLesson.content.length} {subLesson.content.length === 1 ? 'page' : 'pages'}
+                </p>
+              </Card>
+            ))}
+          </div>
+        )}
         
         <div className="flex justify-between mt-auto">
           <Button 
