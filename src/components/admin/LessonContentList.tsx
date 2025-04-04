@@ -61,7 +61,7 @@ const LessonContentList = ({
       if (!confirmed) return;
       
       const { error } = await supabase
-        .from("lesson_content")
+        .from('lesson_content' as any)
         .delete()
         .eq("id", id);
         

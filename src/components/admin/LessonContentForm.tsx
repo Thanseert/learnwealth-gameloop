@@ -96,7 +96,7 @@ const LessonContentForm = ({
       if (editingContent) {
         // Update existing content
         const { error } = await supabase
-          .from("lesson_content")
+          .from('lesson_content' as any)
           .update({
             lesson_id: formData.lesson_id,
             title: formData.title,
@@ -110,7 +110,7 @@ const LessonContentForm = ({
       } else {
         // Add new content
         const { error } = await supabase
-          .from("lesson_content")
+          .from('lesson_content' as any)
           .insert([{
             lesson_id: formData.lesson_id,
             title: formData.title,

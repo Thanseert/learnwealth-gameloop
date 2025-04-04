@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +27,14 @@ interface Lesson {
   title: string;
 }
 
+interface LessonContent {
+  id: number;
+  lesson_id: number;
+  title: string;
+  content: string[];
+  order: number;
+}
+
 const fetchLessonsAndQuestions = async () => {
   // Fetch lessons
   const { data: lessonsData, error: lessonsError } = await supabase
@@ -46,7 +53,7 @@ const fetchLessonsAndQuestions = async () => {
   
   // Fetch lesson content
   const { data: lessonContentData, error: lessonContentError } = await supabase
-    .from('lesson_content')
+    .from('lesson_content' as any)
     .select('*');
     
   if (lessonContentError) throw lessonContentError;
@@ -54,7 +61,7 @@ const fetchLessonsAndQuestions = async () => {
   return { 
     lessons: lessonsData, 
     questions: questionsData, 
-    lessonContent: lessonContentData || [] 
+    lessonContent: (lessonContentData || []) as unknown as LessonContent[] 
   };
 };
 
@@ -100,7 +107,6 @@ const Admin = () => {
     );
   }
 
-  // If not authenticated, show login form
   if (!isAuthenticated) {
     return <AdminLoginForm isAdmin={isAdmin} onAuthenticated={() => setIsAuthenticated(true)} />;
   }
@@ -126,7 +132,6 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Tab navigation */}
         <div className="flex space-x-2 border-b pb-2">
           <Button 
             variant={activeTab === 'analytics' ? 'default' : 'ghost'}
@@ -154,7 +159,6 @@ const Admin = () => {
           </Button>
         </div>
 
-        {/* Tab content */}
         <div className="space-y-8">
           {activeTab === 'analytics' && (
             <AnalyticsDashboard />

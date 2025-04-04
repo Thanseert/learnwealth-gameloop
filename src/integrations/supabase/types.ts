@@ -45,6 +45,41 @@ export type Database = {
           },
         ]
       }
+      lesson_content: {
+        Row: {
+          content: string[]
+          created_at: string
+          id: number
+          lesson_id: number | null
+          order: number
+          title: string
+        }
+        Insert: {
+          content: string[]
+          created_at?: string
+          id?: number
+          lesson_id?: number | null
+          order?: number
+          title: string
+        }
+        Update: {
+          content?: string[]
+          created_at?: string
+          id?: number
+          lesson_id?: number | null
+          order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_content_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           created_at: string

@@ -38,15 +38,17 @@ export function LessonContent({
     const fetchSubLessons = async () => {
       try {
         setLoading(true);
+        // Use a typecasting approach to work around type issues
         const { data, error } = await supabase
-          .from('lesson_content')
+          .from('lesson_content' as any)
           .select('id, title, content, order')
           .eq('lesson_id', lessonId)
           .order('order');
           
         if (error) throw error;
         
-        setSubLessons(data || []);
+        // Cast the data to our SubLesson type
+        setSubLessons((data || []) as unknown as SubLesson[]);
       } catch (err) {
         console.error('Error fetching sub-lessons:', err);
       } finally {
