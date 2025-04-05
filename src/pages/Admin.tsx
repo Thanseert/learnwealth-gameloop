@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,8 +12,6 @@ import QuestionList from "@/components/admin/QuestionList";
 import LevelForm from "@/components/admin/LevelForm";
 import LevelList from "@/components/admin/LevelList";
 import AnalyticsDashboard from "@/components/admin/analytics/AnalyticsDashboard";
-import LessonContentForm from "@/components/admin/LessonContentForm";
-import LessonContentList from "@/components/admin/LessonContentList";
 
 interface Question {
   id: number;
@@ -25,14 +24,6 @@ interface Question {
 interface Lesson {
   id: number;
   title: string;
-}
-
-interface LessonContent {
-  id: number;
-  lesson_id: number;
-  title: string;
-  content: string[];
-  order: number;
 }
 
 const fetchLessonsAndQuestions = async () => {
@@ -50,18 +41,10 @@ const fetchLessonsAndQuestions = async () => {
     .select('*');
 
   if (questionsError) throw questionsError;
-  
-  // Fetch lesson content
-  const { data: lessonContentData, error: lessonContentError } = await supabase
-    .from('lesson_content' as any)
-    .select('*');
-    
-  if (lessonContentError) throw lessonContentError;
 
   return { 
     lessons: lessonsData, 
-    questions: questionsData, 
-    lessonContent: (lessonContentData || []) as unknown as LessonContent[] 
+    questions: questionsData
   };
 };
 
@@ -71,7 +54,7 @@ const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'questions' | 'levels' | 'content'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'questions' | 'levels'>('analytics');
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['admin-data'],
@@ -113,7 +96,6 @@ const Admin = () => {
 
   const lessons = data?.lessons || [];
   const questions = data?.questions || [];
-  const lessonContent = data?.lessonContent || [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -151,12 +133,6 @@ const Admin = () => {
           >
             Manage Levels
           </Button>
-          <Button 
-            variant={activeTab === 'content' ? 'default' : 'ghost'}
-            onClick={() => setActiveTab('content')}
-          >
-            Manage Lesson Content
-          </Button>
         </div>
 
         <div className="space-y-8">
@@ -187,21 +163,6 @@ const Admin = () => {
               <LevelForm onLevelAdded={refetch} />
               
               <LevelList lessons={lessons} onLevelDeleted={refetch} />
-            </>
-          )}
-          
-          {activeTab === 'content' && (
-            <>
-              <LessonContentForm 
-                lessons={lessons} 
-                onContentUpdated={refetch}
-              />
-              
-              <LessonContentList 
-                lessonContent={lessonContent} 
-                lessons={lessons} 
-                onContentDeleted={refetch} 
-              />
             </>
           )}
         </div>
