@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,16 +7,15 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
-import Lessons from "./pages/Lessons";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import QuizFlow from "./pages/QuizFlow";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  // We'll keep the isAdmin state for future use, but won't check email
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
@@ -78,17 +78,17 @@ const App = () => {
               path="/auth"
               element={
                 isAuthenticated ? (
-                  <Navigate to="/lessons" replace />
+                  <Navigate to="/quiz" replace />
                 ) : (
                   <Auth />
                 )
               }
             />
             <Route
-              path="/lessons"
+              path="/quiz"
               element={
                 isAuthenticated ? (
-                  <Lessons />
+                  <QuizFlow />
                 ) : (
                   <Navigate to="/auth" replace />
                 )

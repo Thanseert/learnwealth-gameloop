@@ -45,7 +45,7 @@ export default function Auth() {
         });
         
         if (error) throw error;
-        navigate("/lessons");
+        navigate("/quiz");
       }
     } catch (error: any) {
       toast.error(error.message);

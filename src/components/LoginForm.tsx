@@ -34,7 +34,7 @@ export function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("userData", JSON.stringify(formData));
-    navigate("/lessons");
+    navigate("/quiz");
   };
 
   return (
