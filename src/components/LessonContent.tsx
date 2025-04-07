@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ChevronRight, BookOpen, Star, ListTodo } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface SubLesson {
   id: number;
@@ -49,15 +50,26 @@ export function LessonContent({
         
         // Cast the data to our SubLesson type
         setSubLessons((data || []) as unknown as SubLesson[]);
+        
+        // If there are no sub-lessons and this is likely a quiz-only lesson,
+        // let's automatically start the quiz with a default ID
+        if (data && data.length === 0) {
+          // Use a default quiz ID (we'll use lessonId*100 as a convention)
+          const defaultQuizId = lessonId * 100;
+          setTimeout(() => {
+            onStartQuiz(defaultQuizId);
+          }, 100); // Short delay to ensure UI is ready
+        }
       } catch (err) {
         console.error('Error fetching sub-lessons:', err);
+        toast.error('Failed to load lesson content');
       } finally {
         setLoading(false);
       }
     };
     
     fetchSubLessons();
-  }, [lessonId]);
+  }, [lessonId, onStartQuiz]);
   
   const getDifficultyColor = () => {
     switch (difficulty) {
@@ -108,12 +120,13 @@ export function LessonContent({
     setCurrentPage(0);
   };
 
+  // If still loading, show loading state
   if (loading) {
     return <div className="min-h-[70vh] flex items-center justify-center">Loading lesson content...</div>;
   }
 
-  // If no sub-lesson is selected, show the list of sub-lessons
-  if (selectedSubLesson === null) {
+  // If no sub-lesson is selected and we have sublessons, show the list of sub-lessons
+  if (selectedSubLesson === null && subLessons.length > 0) {
     return (
       <div className="min-h-[70vh] flex flex-col animate-fade-in">
         <div className="mb-6 flex items-center gap-2">
@@ -135,30 +148,23 @@ export function LessonContent({
         
         <p className="mb-6 text-gray-600">{description}</p>
         
-        {subLessons.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10">
-            <p className="text-gray-500 mb-4">No lesson content available yet.</p>
-            <Button onClick={onBack}>Back to Lessons</Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {subLessons.map((subLesson) => (
-              <Card 
-                key={subLesson.id} 
-                className="p-6 hover:shadow-md transition-shadow cursor-pointer bg-white border border-purple-100"
-                onClick={() => handleSelectSubLesson(subLesson.id)}
-              >
-                <div className="flex items-center gap-3">
-                  <ListTodo className="h-6 w-6 text-purple-600" />
-                  <h3 className="font-semibold text-lg">{subLesson.title}</h3>
-                </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  {subLesson.content.length} {subLesson.content.length === 1 ? 'page' : 'pages'}
-                </p>
-              </Card>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {subLessons.map((subLesson) => (
+            <Card 
+              key={subLesson.id} 
+              className="p-6 hover:shadow-md transition-shadow cursor-pointer bg-white border border-purple-100"
+              onClick={() => handleSelectSubLesson(subLesson.id)}
+            >
+              <div className="flex items-center gap-3">
+                <ListTodo className="h-6 w-6 text-purple-600" />
+                <h3 className="font-semibold text-lg">{subLesson.title}</h3>
+              </div>
+              <p className="mt-2 text-sm text-gray-500">
+                {subLesson.content.length} {subLesson.content.length === 1 ? 'page' : 'pages'}
+              </p>
+            </Card>
+          ))}
+        </div>
         
         <div className="flex justify-between mt-auto">
           <Button 
@@ -169,6 +175,19 @@ export function LessonContent({
             Back to Lessons
           </Button>
         </div>
+      </div>
+    );
+  }
+
+  // If we have no sub-lessons and we're not loading, this is handled in the useEffect
+  // by automatically calling onStartQuiz, but just in case they manage to see this
+  if (subLessons.length === 0 && !loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center animate-fade-in">
+        <p className="text-lg text-gray-600 mb-4">Starting quiz...</p>
+        <Button onClick={onBack} variant="outline">
+          Back to Lessons
+        </Button>
       </div>
     );
   }
