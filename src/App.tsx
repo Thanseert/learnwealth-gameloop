@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import QuizFlow from "./pages/QuizFlow";
+import Lessons from "./pages/Lessons";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,16 @@ const App = () => {
               element={
                 isAuthenticated ? (
                   <QuizFlow />
+                ) : (
+                  <Navigate to="/auth" replace />
+                )
+              }
+            />
+            <Route
+              path="/lessons"
+              element={
+                isAuthenticated ? (
+                  <Lessons />
                 ) : (
                   <Navigate to="/auth" replace />
                 )
