@@ -1,8 +1,20 @@
 
 import { Button } from "@/components/ui/button";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface Lesson {
   id: number;
@@ -19,10 +31,12 @@ interface LevelListProps {
 }
 
 const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleDeleteLevel = async (id: number) => {
     try {
-      const confirmed = window.confirm('Are you sure you want to delete this level? This will also delete any questions associated with this level.');
-      if (!confirmed) return;
+      setIsDeleting(true);
       
       // First check if there are any questions associated with this level
       const { data: questionsData, error: questionsError } = await supabase
@@ -30,7 +44,11 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
         .select('id')
         .eq('lesson_id', id);
         
-      if (questionsError) throw questionsError;
+      if (questionsError) {
+        console.error('Error checking questions:', questionsError);
+        toast.error('Error checking associated questions');
+        return;
+      }
       
       // Delete any associated questions first
       if (questionsData && questionsData.length > 0) {
@@ -39,7 +57,23 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
           .delete()
           .eq('lesson_id', id);
           
-        if (deleteQuestionsError) throw deleteQuestionsError;
+        if (deleteQuestionsError) {
+          console.error('Error deleting questions:', deleteQuestionsError);
+          toast.error('Error deleting associated questions');
+          return;
+        }
+      }
+
+      // Check for completed_lessons relationships and delete those first
+      const { error: deleteCompletedLessonsError } = await supabase
+        .from('completed_lessons')
+        .delete()
+        .eq('lesson_id', id);
+        
+      if (deleteCompletedLessonsError) {
+        console.error('Error deleting completed lessons:', deleteCompletedLessonsError);
+        toast.error('Error deleting lesson completion records');
+        return;
       }
       
       // Now delete the level
@@ -48,13 +82,20 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting lesson:', error);
+        toast.error(`Error deleting lesson: ${error.message}`);
+        return;
+      }
       
       toast.success('Level deleted successfully');
       onLevelDeleted();
     } catch (err) {
       console.error('Error deleting level:', err);
       toast.error('Error deleting level');
+    } finally {
+      setIsDeleting(false);
+      setDeletingId(null);
     }
   };
 
@@ -86,9 +127,30 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteLevel(lesson.id)}>
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Level</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete "{lesson.title}"? This will also delete any associated questions and completion records. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDeleteLevel(lesson.id)}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting && deletingId === lesson.id ? 'Deleting...' : 'Delete'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>
