@@ -37,34 +37,11 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
   const handleDeleteLevel = async (id: number) => {
     try {
       setIsDeleting(true);
+      setDeletingId(id);
       
-      // First check if there are any questions associated with this level
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('id')
-        .eq('lesson_id', id);
-        
-      if (questionsError) {
-        console.error('Error checking questions:', questionsError);
-        toast.error('Error checking associated questions');
-        return;
-      }
+      // IMPORTANT: Perform operations in this specific order to ensure all foreign key constraints are respected
       
-      // Delete any associated questions first
-      if (questionsData && questionsData.length > 0) {
-        const { error: deleteQuestionsError } = await supabase
-          .from('questions')
-          .delete()
-          .eq('lesson_id', id);
-          
-        if (deleteQuestionsError) {
-          console.error('Error deleting questions:', deleteQuestionsError);
-          toast.error('Error deleting associated questions');
-          return;
-        }
-      }
-
-      // Check for completed_lessons relationships and delete those first
+      // 1. First delete any completed_lessons records
       const { error: deleteCompletedLessonsError } = await supabase
         .from('completed_lessons')
         .delete()
@@ -76,7 +53,31 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
         return;
       }
       
-      // Now delete the level
+      // 2. Then delete any questions associated with this level
+      const { error: deleteQuestionsError } = await supabase
+        .from('questions')
+        .delete()
+        .eq('lesson_id', id);
+          
+      if (deleteQuestionsError) {
+        console.error('Error deleting questions:', deleteQuestionsError);
+        toast.error('Error deleting associated questions');
+        return;
+      }
+      
+      // 3. Delete any lesson_content associated with this level
+      const { error: deleteLessonContentError } = await supabase
+        .from('lesson_content')
+        .delete()
+        .eq('lesson_id', id);
+          
+      if (deleteLessonContentError) {
+        console.error('Error deleting lesson content:', deleteLessonContentError);
+        toast.error('Error deleting lesson content');
+        return;
+      }
+      
+      // 4. Finally delete the lesson itself
       const { error } = await supabase
         .from('lessons')
         .delete()
@@ -137,7 +138,7 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Level</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete "{lesson.title}"? This will also delete any associated questions and completion records. This action cannot be undone.
+                          Are you sure you want to delete "{lesson.title}"? This will also delete any associated questions, content, and completion records. This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
