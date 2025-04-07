@@ -39,45 +39,9 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
       setIsDeleting(true);
       setDeletingId(id);
       
-      // IMPORTANT: Perform operations in this specific order to ensure all foreign key constraints are respected
-      
-      // 1. First delete any completed_lessons records
-      const { error: deleteCompletedLessonsError } = await supabase
-        .from('completed_lessons')
-        .delete()
-        .eq('lesson_id', id);
-        
-      if (deleteCompletedLessonsError) {
-        console.error('Error deleting completed lessons:', deleteCompletedLessonsError);
-        toast.error('Error deleting lesson completion records');
-        return;
-      }
-      
-      // 2. Then delete any questions associated with this level
-      const { error: deleteQuestionsError } = await supabase
-        .from('questions')
-        .delete()
-        .eq('lesson_id', id);
-          
-      if (deleteQuestionsError) {
-        console.error('Error deleting questions:', deleteQuestionsError);
-        toast.error('Error deleting associated questions');
-        return;
-      }
-      
-      // 3. Delete any lesson_content associated with this level
-      const { error: deleteLessonContentError } = await supabase
-        .from('lesson_content')
-        .delete()
-        .eq('lesson_id', id);
-          
-      if (deleteLessonContentError) {
-        console.error('Error deleting lesson content:', deleteLessonContentError);
-        toast.error('Error deleting lesson content');
-        return;
-      }
-      
-      // 4. Finally delete the lesson itself
+      // With CASCADE constraints, we only need to delete the lesson itself
+      // All related records in completed_lessons, questions, and lesson_content 
+      // will be automatically deleted
       const { error } = await supabase
         .from('lessons')
         .delete()
@@ -138,7 +102,7 @@ const LevelList = ({ lessons, onLevelDeleted }: LevelListProps) => {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Delete Level</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete "{lesson.title}"? This will also delete any associated questions, content, and completion records. This action cannot be undone.
+                          Are you sure you want to delete "{lesson.title}"? This will also delete all associated questions, content, and completion records. This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
