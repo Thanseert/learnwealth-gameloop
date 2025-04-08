@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { LessonContent } from "@/components/LessonContent";
@@ -390,9 +391,9 @@ const Lessons = () => {
   let currentQuestion: Question | undefined;
   
   if (activeQuiz && activeLesson) {
-    const subLesson = activeLesson.subLessons.find(sl => sl.id === activeQuiz.subLessonId);
+    const subLesson = activeLesson.subLessons?.find(sl => sl.id === activeQuiz.subLessonId);
     if (subLesson) {
-      currentQuestion = subLesson.questions[currentQuestionIndex];
+      currentQuestion = subLesson.questions?.[currentQuestionIndex];
     }
   }
 
@@ -440,7 +441,7 @@ const Lessons = () => {
             onComplete={handleQuizComplete}
             onClose={handleQuizClose}
             currentQuestion={currentQuestionIndex + 1}
-            totalQuestions={activeLesson?.subLessons.find(sl => sl.id === activeQuiz.subLessonId)?.questions.length || 0}
+            totalQuestions={activeLesson?.subLessons?.find(sl => sl.id === activeQuiz.subLessonId)?.questions?.length || 0}
           />
         ) : activeLessonContent && activeLesson ? (
           <div>
@@ -529,7 +530,8 @@ const Lessons = () => {
                       progress={lesson.isCompleted ? 100 : 0}
                       isLocked={index > 0 && !lessons[index - 1].isCompleted}
                       isLast={index === lessons.length - 1}
-                      questionsCount={lesson.subLessons.reduce((total, subLesson) => total + subLesson.questions.length, 0)}
+                      questionsCount={lesson.subLessons?.reduce((total, subLesson) => 
+                        total + (subLesson.questions?.length || 0), 0) || 0}
                     />
                   ))}
                 </div>
