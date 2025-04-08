@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Leaderboard } from "@/components/Leaderboard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Question {
   id: number;
@@ -191,6 +192,7 @@ const createSubLessonsForLesson = (lessonId: number, questions: Question[]): Sub
 
 const Lessons = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [totalXP, setTotalXP] = useState(0);
   const [activeQuiz, setActiveQuiz] = useState<{lessonId: number, subLessonId: number} | null>(null);
   const [activeLessonContent, setActiveLessonContent] = useState<number | null>(null);
@@ -404,11 +406,11 @@ const Lessons = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      <div className="container py-8 space-y-8 animate-fade-in max-w-4xl mx-auto">
+      <div className="container py-4 md:py-8 space-y-4 md:space-y-8 animate-fade-in mx-auto px-4 md:px-6">
         {showRewardAnimation && (
           <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
             <div className="relative">
-              <div className="text-6xl font-bold text-yellow-500 animate-ping mb-20">
+              <div className="text-4xl md:text-6xl font-bold text-yellow-500 animate-ping mb-20">
                 +{activeLesson?.xp} XP
               </div>
               {[...Array(20)].map((_, i) => (
@@ -453,7 +455,7 @@ const Lessons = () => {
               >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
-              <h1 className="text-2xl font-bold text-purple-900 ml-2">Back to Lessons</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-purple-900 ml-2">Back to Lessons</h1>
             </div>
             
             <LessonContent
@@ -467,7 +469,7 @@ const Lessons = () => {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-8 gap-4">
               <div className="flex items-center gap-2">
                 <Button
                   variant="ghost"
@@ -477,11 +479,11 @@ const Lessons = () => {
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
-                <h1 className="text-3xl font-bold text-purple-900">
+                <h1 className="text-2xl md:text-3xl font-bold text-purple-900 truncate">
                   Financial Adventure
                 </h1>
               </div>
-              <div className="flex items-center space-x-4">
+              <div className="flex flex-wrap items-center gap-3 md:space-x-4">
                 <div className="flex items-center space-x-2 bg-purple-100 px-3 py-2 rounded-lg">
                   <Trophy className="w-5 h-5 text-purple-600" />
                   <span className="font-bold text-purple-800">{totalXP} XP</span>
@@ -498,11 +500,11 @@ const Lessons = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white rounded-lg p-6 shadow-md mb-8 border border-purple-100">
-                  <div className="flex justify-between items-center mb-2">
-                    <h2 className="text-xl font-bold text-purple-900">Quest Progress</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+              <div className="lg:col-span-2 space-y-4 md:space-y-8">
+                <div className="bg-white rounded-lg p-4 md:p-6 shadow-md mb-4 md:mb-8 border border-purple-100">
+                  <div className="flex justify-between items-center mb-2 flex-wrap gap-2">
+                    <h2 className="text-lg md:text-xl font-bold text-purple-900">Quest Progress</h2>
                     <div className="flex items-center text-sm font-medium text-purple-600">
                       <Award className="w-4 h-4 mr-1" />
                       {completedLessonsCount}/{totalLessonsCount} Completed
@@ -515,7 +517,7 @@ const Lessons = () => {
                   />
                 </div>
 
-                <div className="space-y-8">
+                <div className="space-y-8 md:space-y-12">
                   {lessons.map((lesson, index) => (
                     <LessonCard
                       key={lesson.id}
@@ -536,9 +538,22 @@ const Lessons = () => {
                 </div>
               </div>
 
-              <div className="lg:col-span-1">
-                <Leaderboard />
-              </div>
+              {!isMobile && (
+                <div className="lg:col-span-1 hidden lg:block">
+                  <Leaderboard />
+                </div>
+              )}
+              
+              {isMobile && (
+                <div className="mt-8 mb-4">
+                  <Button 
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
+                    className="w-full bg-purple-100 hover:bg-purple-200 text-purple-800"
+                  >
+                    Back to Top
+                  </Button>
+                </div>
+              )}
             </div>
           </>
         )}

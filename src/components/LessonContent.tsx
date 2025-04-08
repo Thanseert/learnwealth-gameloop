@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SubLesson {
   id: number;
@@ -28,6 +29,7 @@ export function LessonContent({
   onBack,
 }: LessonContentProps) {
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     const startQuiz = async () => {
@@ -54,14 +56,21 @@ export function LessonContent({
   
   // If still loading, show loading state
   if (loading) {
-    return <div className="min-h-[70vh] flex items-center justify-center">Loading quiz...</div>;
+    return (
+      <div className="min-h-[50vh] md:min-h-[70vh] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-base md:text-lg text-gray-600">Loading quiz...</p>
+        </div>
+      </div>
+    );
   }
 
   // Always show the "Starting quiz" screen
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center animate-fade-in">
-      <p className="text-lg text-gray-600 mb-4">Starting quiz...</p>
-      <Button onClick={onBack} variant="outline">
+    <div className="min-h-[50vh] md:min-h-[70vh] flex flex-col items-center justify-center animate-fade-in p-4">
+      <p className="text-base md:text-lg text-gray-600 mb-4 text-center">Starting quiz...</p>
+      <Button onClick={onBack} variant="outline" className="w-full md:w-auto">
         Back to Lessons
       </Button>
     </div>
