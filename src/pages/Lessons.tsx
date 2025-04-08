@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { LessonContent } from "@/components/LessonContent";
@@ -254,7 +253,7 @@ const Lessons = () => {
     const lesson = lessons.find(l => l.id === lessonId);
     if (!lesson) return;
     
-    const subLesson = lesson.subLessons.find(sl => sl.id === subLessonId);
+    const subLesson = lesson.subLessons?.find(sl => sl.id === subLessonId);
     if (subLesson?.questions && subLesson.questions.length > 0) {
       setActiveQuiz({ lessonId, subLessonId });
       setActiveLessonContent(null);
@@ -392,8 +391,8 @@ const Lessons = () => {
   
   if (activeQuiz && activeLesson) {
     const subLesson = activeLesson.subLessons?.find(sl => sl.id === activeQuiz.subLessonId);
-    if (subLesson) {
-      currentQuestion = subLesson.questions?.[currentQuestionIndex];
+    if (subLesson && subLesson.questions) {
+      currentQuestion = subLesson.questions[currentQuestionIndex];
     }
   }
 
