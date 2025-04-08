@@ -173,7 +173,7 @@ const createSubLessonsForLesson = (lessonId: number, questions: Question[]): Sub
           "# Default Lesson Content\n\nThis lesson content is still being developed. Check back soon for updates!",
           "# Coming Soon\n\nWe're working on creating engaging content for this lesson."
         ],
-        questions: questions.slice(0, Math.min(5, questions.length))
+        questions: questions
       },
       {
         id: lessonId * 100 + 1,
@@ -182,7 +182,7 @@ const createSubLessonsForLesson = (lessonId: number, questions: Question[]): Sub
           "# Advanced Concepts\n\nThis section will cover more in-depth topics related to this lesson.",
           "# Stay Tuned\n\nMore content is being developed for this section."
         ],
-        questions: questions.slice(Math.min(5, questions.length), questions.length)
+        questions: []
       }
     ];
   }
