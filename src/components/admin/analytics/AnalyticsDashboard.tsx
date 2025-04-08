@@ -26,7 +26,7 @@ const fetchAnalyticsData = async () => {
   // Create user signup data for each day
   const signupData = last7Days.map(date => {
     const count = profilesData?.filter(user => 
-      user.created_at && user.created_at.startsWith(date)
+      user?.created_at && user.created_at.startsWith(date)
     ).length || 0;
     
     return { 
@@ -53,13 +53,13 @@ const fetchAnalyticsData = async () => {
     value: Math.floor(Math.random() * 40) + 20
   }));
   
-  // Calculate totals and averages
-  const totalActiveUsers = activeUserData.reduce((sum, item) => sum + item.value, 0);
-  const totalVisitors = visitorData.reduce((sum, item) => sum + item.value, 0);
-  const avgBounceRate = Math.floor(
-    bounceRateData.reduce((sum, item) => sum + item.value, 0) / bounceRateData.length
-  );
-  const conversionRate = Math.floor((totalActiveUsers / totalVisitors) * 100);
+  // Calculate totals and averages with safety checks
+  const totalActiveUsers = activeUserData?.reduce((sum, item) => sum + (item?.value || 0), 0) || 0;
+  const totalVisitors = visitorData?.reduce((sum, item) => sum + (item?.value || 0), 0) || 0;
+  const avgBounceRate = bounceRateData?.length 
+    ? Math.floor(bounceRateData.reduce((sum, item) => sum + (item?.value || 0), 0) / bounceRateData.length)
+    : 0;
+  const conversionRate = totalVisitors ? Math.floor((totalActiveUsers / totalVisitors) * 100) : 0;
   
   return {
     userCount: totalUsers,
@@ -67,10 +67,10 @@ const fetchAnalyticsData = async () => {
     totalVisitors: Math.floor(totalVisitors / 7),
     bounceRate: avgBounceRate,
     conversionRate,
-    signupTrend: signupData,
-    activeUserTrend: activeUserData,
-    visitorTrend: visitorData,
-    bounceRateTrend: bounceRateData
+    signupTrend: signupData || [],
+    activeUserTrend: activeUserData || [],
+    visitorTrend: visitorData || [],
+    bounceRateTrend: bounceRateData || []
   };
 };
 
@@ -97,30 +97,42 @@ const AnalyticsDashboard = () => {
     );
   }
 
+  // Use default empty values to prevent null/undefined errors
+  const safeData = {
+    userCount: data?.userCount || 0,
+    dailyActiveUsers: data?.dailyActiveUsers || 0,
+    bounceRate: data?.bounceRate || 0,
+    conversionRate: data?.conversionRate || 0,
+    signupTrend: data?.signupTrend || [],
+    activeUserTrend: data?.activeUserTrend || [],
+    visitorTrend: data?.visitorTrend || [],
+    bounceRateTrend: data?.bounceRateTrend || []
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <AnalyticsCard 
           title="Total Users" 
-          value={data?.userCount || 0} 
+          value={safeData.userCount} 
           description="Total registered users"
           icon={<Users className="h-4 w-4" />}
         />
         <AnalyticsCard 
           title="Daily Active Users" 
-          value={data?.dailyActiveUsers || 0} 
+          value={safeData.dailyActiveUsers} 
           description="Avg. users per day"
           icon={<UserPlus className="h-4 w-4" />}
         />
         <AnalyticsCard 
           title="Bounce Rate" 
-          value={`${data?.bounceRate || 0}%`} 
+          value={`${safeData.bounceRate}%`} 
           description="Avg. exit rate"
           icon={<TrendingUp className="h-4 w-4" />}
         />
         <AnalyticsCard 
           title="Conversion Rate" 
-          value={`${data?.conversionRate || 0}%`} 
+          value={`${safeData.conversionRate}%`} 
           description="Visitors to users"
           icon={<BarChart className="h-4 w-4" />}
         />
@@ -129,13 +141,13 @@ const AnalyticsDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AnalyticsTrend
           title="User Signups" 
-          data={data?.signupTrend || []}
+          data={safeData.signupTrend}
           color="#4ade80"
           icon={<Users className="h-4 w-4" />}
         />
         <AnalyticsTrend
           title="Daily Active Users" 
-          data={data?.activeUserTrend || []}
+          data={safeData.activeUserTrend}
           color="#3b82f6"
           icon={<UserPlus className="h-4 w-4" />}
         />
@@ -144,13 +156,13 @@ const AnalyticsDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AnalyticsTrend
           title="Visitors" 
-          data={data?.visitorTrend || []}
+          data={safeData.visitorTrend}
           color="#f97316"
           icon={<Users className="h-4 w-4" />}
         />
         <AnalyticsTrend
           title="Bounce Rate" 
-          data={data?.bounceRateTrend || []}
+          data={safeData.bounceRateTrend}
           color="#ef4444"
           icon={<TrendingUp className="h-4 w-4" />}
         />
