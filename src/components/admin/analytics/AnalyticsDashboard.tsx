@@ -4,74 +4,106 @@ import { supabase } from "@/integrations/supabase/client";
 import AnalyticsCard from "./AnalyticsCard";
 import AnalyticsTrend from "./AnalyticsTrend";
 import { Users, TrendingUp, BarChart, UserPlus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Function to fetch analytics data from Supabase
 const fetchAnalyticsData = async () => {
-  // For active users and visitor data, in a real app we would have properly 
-  // tracked this data. For now, we'll create mock data based on profiles.
-  const { data: profilesData } = await supabase
-    .from('profiles')
-    .select('created_at');
-  
-  // Get total user count  
-  const totalUsers = profilesData?.length || 0;
-  
-  // Generate date strings for the last 7 days
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (6 - i));
-    return date.toISOString().split('T')[0];
-  });
-  
-  // Create user signup data for each day
-  const signupData = last7Days.map(date => {
-    const count = profilesData?.filter(user => 
-      user?.created_at && user.created_at.startsWith(date)
-    ).length || 0;
+  try {
+    // For active users and visitor data, in a real app we would have properly 
+    // tracked this data. For now, we'll create mock data based on profiles.
+    const { data: profilesData, error } = await supabase
+      .from('profiles')
+      .select('created_at');
     
-    return { 
-      date: date.slice(5), // Format as MM-DD
-      value: count 
+    if (error) {
+      console.error("Error fetching profiles data:", error);
+      throw error;
+    }
+    
+    // Get total user count with safety check
+    const totalUsers = profilesData?.length || 0;
+    
+    // Generate date strings for the last 7 days
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date.toISOString().split('T')[0];
+    });
+    
+    // Create user signup data for each day with null checks
+    const signupData = last7Days.map(date => {
+      // Make sure profilesData exists before filtering
+      const count = profilesData ? profilesData.filter(user => 
+        user?.created_at && user.created_at.startsWith(date)
+      ).length : 0;
+      
+      return { 
+        date: date.slice(5), // Format as MM-DD
+        value: count 
+      };
+    });
+
+    // Mock daily active users data
+    const activeUserData = last7Days.map(date => ({
+      date: date.slice(5),
+      value: Math.floor(Math.random() * (totalUsers * 0.7)) + Math.floor(totalUsers * 0.2)
+    }));
+
+    // Mock visitor data - generally higher than user count
+    const visitorData = last7Days.map(date => ({
+      date: date.slice(5),
+      value: Math.floor(Math.random() * 50) + totalUsers + 20
+    }));
+
+    // Mock bounce rate data (percentage between 20% and 60%)
+    const bounceRateData = last7Days.map(date => ({
+      date: date.slice(5),
+      value: Math.floor(Math.random() * 40) + 20
+    }));
+    
+    // Calculate totals and averages with comprehensive safety checks
+    const totalActiveUsers = Array.isArray(activeUserData) 
+      ? activeUserData.reduce((sum, item) => sum + (item?.value || 0), 0) 
+      : 0;
+      
+    const totalVisitors = Array.isArray(visitorData) 
+      ? visitorData.reduce((sum, item) => sum + (item?.value || 0), 0)
+      : 0;
+      
+    const avgBounceRate = Array.isArray(bounceRateData) && bounceRateData.length > 0
+      ? Math.floor(bounceRateData.reduce((sum, item) => sum + (item?.value || 0), 0) / bounceRateData.length)
+      : 0;
+      
+    const conversionRate = totalVisitors > 0 
+      ? Math.floor((totalActiveUsers / totalVisitors) * 100) 
+      : 0;
+    
+    return {
+      userCount: totalUsers,
+      dailyActiveUsers: Math.floor(totalActiveUsers / 7),
+      totalVisitors: Math.floor(totalVisitors / 7),
+      bounceRate: avgBounceRate,
+      conversionRate,
+      signupTrend: signupData || [],
+      activeUserTrend: activeUserData || [],
+      visitorTrend: visitorData || [],
+      bounceRateTrend: bounceRateData || []
     };
-  });
-
-  // Mock daily active users data
-  const activeUserData = last7Days.map(date => ({
-    date: date.slice(5),
-    value: Math.floor(Math.random() * (totalUsers * 0.7)) + Math.floor(totalUsers * 0.2)
-  }));
-
-  // Mock visitor data - generally higher than user count
-  const visitorData = last7Days.map(date => ({
-    date: date.slice(5),
-    value: Math.floor(Math.random() * 50) + totalUsers + 20
-  }));
-
-  // Mock bounce rate data (percentage between 20% and 60%)
-  const bounceRateData = last7Days.map(date => ({
-    date: date.slice(5),
-    value: Math.floor(Math.random() * 40) + 20
-  }));
-  
-  // Calculate totals and averages with safety checks
-  const totalActiveUsers = activeUserData?.reduce((sum, item) => sum + (item?.value || 0), 0) || 0;
-  const totalVisitors = visitorData?.reduce((sum, item) => sum + (item?.value || 0), 0) || 0;
-  const avgBounceRate = bounceRateData?.length 
-    ? Math.floor(bounceRateData.reduce((sum, item) => sum + (item?.value || 0), 0) / bounceRateData.length)
-    : 0;
-  const conversionRate = totalVisitors ? Math.floor((totalActiveUsers / totalVisitors) * 100) : 0;
-  
-  return {
-    userCount: totalUsers,
-    dailyActiveUsers: Math.floor(totalActiveUsers / 7),
-    totalVisitors: Math.floor(totalVisitors / 7),
-    bounceRate: avgBounceRate,
-    conversionRate,
-    signupTrend: signupData || [],
-    activeUserTrend: activeUserData || [],
-    visitorTrend: visitorData || [],
-    bounceRateTrend: bounceRateData || []
-  };
+  } catch (error) {
+    console.error("Error in fetchAnalyticsData:", error);
+    // Return default values to prevent undefined errors
+    return {
+      userCount: 0,
+      dailyActiveUsers: 0,
+      totalVisitors: 0,
+      bounceRate: 0,
+      conversionRate: 0,
+      signupTrend: [],
+      activeUserTrend: [],
+      visitorTrend: [],
+      bounceRateTrend: []
+    };
+  }
 };
 
 const AnalyticsDashboard = () => {
@@ -82,22 +114,37 @@ const AnalyticsDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="p-4 animate-pulse flex flex-col gap-4">
-        <div className="h-20 bg-gray-200 rounded-md"></div>
-        <div className="h-64 bg-gray-200 rounded-md"></div>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, index) => (
+            <Skeleton key={index} className="h-32 rounded-md" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, index) => (
+            <Skeleton key={index} className="h-64 rounded-md" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(2)].map((_, index) => (
+            <Skeleton key={index} className="h-64 rounded-md" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-500">
-        Error loading analytics data. Please try again later.
+      <div className="p-4 text-red-500 bg-red-50 border border-red-100 rounded-md">
+        <h3 className="font-bold mb-2">Error loading analytics data</h3>
+        <p>{error.message || "Please try again later."}</p>
       </div>
     );
   }
 
   // Use default empty values to prevent null/undefined errors
+  // Make sure we're guarding against completely undefined data
   const safeData = {
     userCount: data?.userCount || 0,
     dailyActiveUsers: data?.dailyActiveUsers || 0,
