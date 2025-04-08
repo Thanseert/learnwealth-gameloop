@@ -51,9 +51,9 @@ export function LessonContent({
         // Cast the data to our SubLesson type
         setSubLessons((data || []) as unknown as SubLesson[]);
         
-        // If there are no sub-lessons and this is likely a quiz-only lesson,
-        // let's automatically start the quiz with a default ID
-        if (data && data.length === 0) {
+        // If there are no sub-lessons or if this is the 'Stock Market Basics' lesson (assuming it's lesson 4)
+        // automatically start the quiz
+        if (data && (data.length === 0 || lessonId === 4)) {
           // Use a default quiz ID (we'll use lessonId*100 as a convention)
           const defaultQuizId = lessonId * 100;
           setTimeout(() => {
@@ -126,7 +126,7 @@ export function LessonContent({
   }
 
   // If no sub-lesson is selected and we have sublessons, show the list of sub-lessons
-  if (selectedSubLesson === null && subLessons.length > 0) {
+  if (selectedSubLesson === null && subLessons.length > 0 && lessonId !== 4) {
     return (
       <div className="min-h-[70vh] flex flex-col animate-fade-in">
         <div className="mb-6 flex items-center gap-2">
@@ -181,7 +181,7 @@ export function LessonContent({
 
   // If we have no sub-lessons and we're not loading, this is handled in the useEffect
   // by automatically calling onStartQuiz, but just in case they manage to see this
-  if (subLessons.length === 0 && !loading) {
+  if (subLessons.length === 0 && !loading || lessonId === 4) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center animate-fade-in">
         <p className="text-lg text-gray-600 mb-4">Starting quiz...</p>
