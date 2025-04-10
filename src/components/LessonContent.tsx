@@ -55,10 +55,13 @@ export function LessonContent({
           return;
         }
         
+        console.log('Fetched questions for lesson', lessonId, ':', questionsData);
+        
         if (questionsData && questionsData.length > 0) {
           setQuestions(questionsData);
         } else {
-          toast.error('No questions found for this lesson');
+          console.log('No questions found for lesson ID:', lessonId);
+          toast.warning('No questions found for this lesson');
         }
         
         // Use a simple sub-lesson structure for now
@@ -80,11 +83,12 @@ export function LessonContent({
   }, [lessonId, title, description]);
   
   const handleStartQuiz = () => {
-    if (questions.length === 0) {
+    if (!questions || questions.length === 0) {
       toast.error('No questions available for this lesson');
       return;
     }
     
+    console.log('Starting quiz with', questions.length, 'questions');
     onStartQuiz(lessonId);
   };
   
@@ -157,7 +161,7 @@ export function LessonContent({
             {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
           </span>
           <span className="text-gray-600 text-sm">
-            {questions.length} question{questions.length !== 1 ? 's' : ''}
+            {questions && questions.length > 0 ? `${questions.length} question${questions.length !== 1 ? 's' : ''}` : 'No questions available'}
           </span>
         </div>
         
@@ -172,10 +176,10 @@ export function LessonContent({
           
           <Button 
             onClick={handleStartQuiz} 
-            disabled={questions.length === 0} 
+            disabled={!questions || questions.length === 0} 
             className="bg-purple-600 hover:bg-purple-700"
           >
-            Start Quiz
+            {questions && questions.length > 0 ? 'Start Quiz' : 'No Questions Available'}
           </Button>
         </div>
       </div>
