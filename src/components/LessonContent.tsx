@@ -33,30 +33,60 @@ export function LessonContent({
   onBack,
 }: LessonContentProps) {
   const [loading, setLoading] = useState(true);
+  const [subLessons, setSubLessons] = useState<SubLesson[]>([]);
+  const [activeSubLesson, setActiveSubLesson] = useState<number | null>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
   const isMobile = useIsMobile();
   
   useEffect(() => {
-    const startQuiz = async () => {
+    const fetchLessonData = async () => {
       try {
         setLoading(true);
-        // Use a default quiz ID based on the lesson ID
-        const defaultQuizId = lessonId;
         
-        // Short delay to ensure UI is ready
-        setTimeout(() => {
-          onStartQuiz(defaultQuizId);
-        }, 100);
+        // Fetch questions for this lesson
+        const { data: questionsData, error: questionsError } = await supabase
+          .from('questions')
+          .select('*')
+          .eq('lesson_id', lessonId);
+          
+        if (questionsError) {
+          console.error('Error fetching questions:', questionsError);
+          toast.error('Failed to load lesson content');
+          return;
+        }
+        
+        if (questionsData && questionsData.length > 0) {
+          setQuestions(questionsData);
+        } else {
+          toast.error('No questions found for this lesson');
+        }
+        
+        // Use a simple sub-lesson structure for now
+        setSubLessons([{
+          id: lessonId,
+          title: title,
+          content: [description]
+        }]);
+        
       } catch (err) {
-        console.error('Error starting quiz:', err);
-        toast.error('Failed to start quiz');
+        console.error('Error loading lesson content:', err);
+        toast.error('Failed to load lesson content');
       } finally {
         setLoading(false);
       }
     };
     
-    // Start the quiz immediately for all lessons
-    startQuiz();
-  }, [lessonId, onStartQuiz]);
+    fetchLessonData();
+  }, [lessonId, title, description]);
+  
+  const handleStartQuiz = () => {
+    if (questions.length === 0) {
+      toast.error('No questions available for this lesson');
+      return;
+    }
+    
+    onStartQuiz(lessonId);
+  };
   
   // If still loading, show loading state
   if (loading) {
@@ -64,7 +94,7 @@ export function LessonContent({
       <div className="min-h-[50vh] md:min-h-[70vh] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-base md:text-lg text-gray-600">Loading quiz...</p>
+          <p className="text-base md:text-lg text-gray-600">Loading lesson content...</p>
         </div>
       </div>
     );
@@ -115,13 +145,41 @@ export function LessonContent({
     );
   };
 
-  // Always show the "Starting quiz" screen with mobile leaderboard
   return (
-    <div className="min-h-[50vh] md:min-h-[70vh] flex flex-col items-center justify-center animate-fade-in p-4">
-      <p className="text-base md:text-lg text-gray-600 mb-4 text-center">Starting quiz...</p>
-      <Button onClick={onBack} variant="outline" className="w-full md:w-auto">
-        Back to Lessons
-      </Button>
+    <div className="min-h-[50vh] md:min-h-[70vh] animate-fade-in p-4">
+      <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-purple-900 mb-4">{title}</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium 
+            ${difficulty === 'easy' ? 'bg-green-100 text-green-800' : 
+              difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
+              'bg-red-100 text-red-800'}`}>
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </span>
+          <span className="text-gray-600 text-sm">
+            {questions.length} question{questions.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+        
+        <div className="prose max-w-none mb-8">
+          <p className="text-gray-700">{description}</p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+          <Button onClick={onBack} variant="outline">
+            Back to Lessons
+          </Button>
+          
+          <Button 
+            onClick={handleStartQuiz} 
+            disabled={questions.length === 0} 
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            Start Quiz
+          </Button>
+        </div>
+      </div>
+      
       <MobileLeaderboard />
     </div>
   );
