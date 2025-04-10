@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { LessonCard } from "@/components/LessonCard";
 import { LessonContent } from "@/components/LessonContent";
 import { ProgressBar } from "@/components/ProgressBar";
-import { Trophy, Coins, ArrowLeft, Award, Star, Gift } from "lucide-react";
+import { Trophy, Coins, ArrowLeft, Award, Star, Gift, ChevronUp } from "lucide-react";
 import { Quiz } from "@/components/Quiz";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Leaderboard } from "@/components/Leaderboard";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface Question {
   id: number;
@@ -369,6 +371,50 @@ const Lessons = () => {
     return progressPercentage;
   };
 
+  const MobileLeaderboard = () => {
+    if (!isMobile || activeQuiz || activeLessonContent) return null;
+    
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-10">
+        {isMobile ? (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button 
+                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-white py-3 rounded-t-lg shadow-lg border-t border-x border-yellow-300"
+              >
+                <Trophy className="h-5 w-5 mr-2" />
+                <span>View Leaderboard</span>
+                <ChevronUp className="h-5 w-5 ml-2" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="p-0 pt-0 max-h-[80vh] overflow-auto rounded-t-xl">
+              <div className="p-4">
+                <Leaderboard />
+              </div>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button 
+                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-white py-3 rounded-t-lg shadow-lg border-t border-x border-yellow-300"
+              >
+                <Trophy className="h-5 w-5 mr-2" />
+                <span>View Leaderboard</span>
+                <ChevronUp className="h-5 w-5 ml-2" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="max-h-[80vh]">
+              <div className="p-4 pt-2">
+                <Leaderboard />
+              </div>
+            </DrawerContent>
+          </Drawer>
+        )}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-50 to-white">
@@ -555,6 +601,8 @@ const Lessons = () => {
                 </div>
               )}
             </div>
+            
+            <MobileLeaderboard />
           </>
         )}
       </div>
