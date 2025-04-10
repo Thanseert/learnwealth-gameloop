@@ -40,7 +40,7 @@ export function LessonContent({
       try {
         setLoading(true);
         // Use a default quiz ID based on the lesson ID
-        const defaultQuizId = lessonId * 100;
+        const defaultQuizId = lessonId;
         
         // Short delay to ensure UI is ready
         setTimeout(() => {

@@ -143,6 +143,7 @@ const QuizFlow = () => {
         const activeLesson = lessons.find(l => l.id === activeQuiz);
         if (!activeLesson) return;
         
+        // Make sure we safely access the questions array
         const questions = activeLesson.questions || [];
         if (currentQuestionIndex < questions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1);
@@ -256,6 +257,7 @@ const QuizFlow = () => {
   let currentQuestion: Question | undefined;
   
   if (activeQuiz && activeLesson && activeLesson.questions) {
+    // Safely access the current question
     currentQuestion = activeLesson.questions[currentQuestionIndex];
   }
 
@@ -354,7 +356,7 @@ const QuizFlow = () => {
                       progress={lesson.isCompleted ? 100 : 0}
                       isLocked={index > 0 && !lessons[index - 1].isCompleted}
                       isLast={index === lessons.length - 1}
-                      questionsCount={lesson.questions.length}
+                      questionsCount={lesson.questions ? lesson.questions.length : 0}
                     />
                   ))}
                 </div>
