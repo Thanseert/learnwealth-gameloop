@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +19,7 @@ interface LessonContentProps {
   title: string;
   description: string;
   difficulty: "easy" | "medium" | "hard";
-  lessonId: number; // Used to fetch sub-lessons from database
+  lessonId: number;
   onStartQuiz: (subLessonId: number) => void;
   onBack: () => void;
 }
@@ -35,12 +36,16 @@ export function LessonContent({
   const [subLessons, setSubLessons] = useState<SubLesson[]>([]);
   const [activeSubLesson, setActiveSubLesson] = useState<number | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
+  const [quizError, setQuizError] = useState<string | null>(null);
   const isMobile = useIsMobile();
   
   useEffect(() => {
     const fetchLessonData = async () => {
       try {
         setLoading(true);
+        setQuizError(null);
+        
+        console.log(`Fetching questions for lesson ID: ${lessonId}`);
         
         // Fetch questions for this lesson
         const { data: questionsData, error: questionsError } = await supabase
@@ -51,19 +56,12 @@ export function LessonContent({
         if (questionsError) {
           console.error('Error fetching questions:', questionsError);
           toast.error('Failed to load lesson content');
+          setQuizError('Failed to load quiz questions. Please try again.');
+          setLoading(false);
           return;
         }
         
-        console.log('Fetched questions for lesson', lessonId, ':', questionsData);
-        
-        if (questionsData && questionsData.length > 0) {
-          setQuestions(questionsData);
-          // Automatically start the quiz if questions are available
-          setTimeout(() => onStartQuiz(lessonId), 100);
-        } else {
-          console.log('No questions found for lesson ID:', lessonId);
-          toast.warning('No questions found for this lesson');
-        }
+        console.log('Fetched questions data:', questionsData);
         
         // Use a simple sub-lesson structure for now
         setSubLessons([{
@@ -72,14 +70,27 @@ export function LessonContent({
           content: [description]
         }]);
         
+        if (questionsData && Array.isArray(questionsData) && questionsData.length > 0) {
+          setQuestions(questionsData);
+          // Wait for state to update before starting quiz
+          setTimeout(() => {
+            console.log("Starting quiz with lesson ID:", lessonId);
+            onStartQuiz(lessonId);
+          }, 100);
+        } else {
+          console.log('No questions found for lesson ID:', lessonId);
+          setQuizError('No questions available for this lesson');
+        }
       } catch (err) {
         console.error('Error loading lesson content:', err);
         toast.error('Failed to load lesson content');
+        setQuizError('An unexpected error occurred. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
     
+    // Only fetch data once when component mounts or lessonId changes
     fetchLessonData();
   }, [lessonId, title, description, onStartQuiz]);
   
@@ -95,8 +106,8 @@ export function LessonContent({
     );
   }
 
-  // If no questions available, show content with message
-  if (!questions || questions.length === 0) {
+  // If there's an error or no questions, show content with error message
+  if (quizError || !questions || questions.length === 0) {
     return (
       <div className="min-h-[50vh] md:min-h-[70vh] animate-fade-in p-4">
         <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md mb-6">
@@ -108,7 +119,9 @@ export function LessonContent({
                 'bg-red-100 text-red-800'}`}>
               {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
             </span>
-            <span className="text-red-500 text-sm font-medium">No questions available</span>
+            {quizError && (
+              <span className="text-red-500 text-sm font-medium">{quizError}</span>
+            )}
           </div>
           
           <div className="prose max-w-none mb-8">
@@ -118,6 +131,12 @@ export function LessonContent({
           <div className="flex flex-col md:flex-row gap-4 justify-between">
             <Button onClick={onBack} variant="outline">
               Back to Lessons
+            </Button>
+            <Button 
+              onClick={() => onStartQuiz(lessonId)}
+              disabled={!questions || questions.length === 0}
+            >
+              {questions && questions.length > 0 ? 'Start Quiz' : 'No Questions Available'}
             </Button>
           </div>
         </div>
