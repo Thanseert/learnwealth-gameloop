@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -37,11 +37,18 @@ export function LessonContent({
   const [activeSubLesson, setActiveSubLesson] = useState<number | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [quizError, setQuizError] = useState<string | null>(null);
+  const [quizStarted, setQuizStarted] = useState(false);
   const isMobile = useIsMobile();
+  const quizStartAttempted = useRef(false);
   
   useEffect(() => {
     const fetchLessonData = async () => {
       try {
+        if (quizStartAttempted.current) {
+          console.log("Quiz start already attempted, skipping fetch");
+          return;
+        }
+        
         setLoading(true);
         setQuizError(null);
         
@@ -72,11 +79,18 @@ export function LessonContent({
         
         if (questionsData && Array.isArray(questionsData) && questionsData.length > 0) {
           setQuestions(questionsData);
-          // Wait for state to update before starting quiz
-          setTimeout(() => {
-            console.log("Starting quiz with lesson ID:", lessonId);
-            onStartQuiz(lessonId);
-          }, 100);
+          
+          // Only try to start the quiz if we haven't already tried
+          if (!quizStarted && !quizStartAttempted.current) {
+            quizStartAttempted.current = true;
+            
+            // Use a timeout to ensure state is updated before starting quiz
+            setTimeout(() => {
+              console.log("Starting quiz with lesson ID:", lessonId);
+              setQuizStarted(true);
+              onStartQuiz(lessonId);
+            }, 300);
+          }
         } else {
           console.log('No questions found for lesson ID:', lessonId);
           setQuizError('No questions available for this lesson');
@@ -92,7 +106,16 @@ export function LessonContent({
     
     // Only fetch data once when component mounts or lessonId changes
     fetchLessonData();
-  }, [lessonId, title, description, onStartQuiz]);
+  }, [lessonId, title, description, onStartQuiz, quizStarted]);
+  
+  // Handle manual quiz start
+  const handleManualQuizStart = () => {
+    if (questions && questions.length > 0) {
+      setQuizStarted(true);
+      quizStartAttempted.current = true;
+      onStartQuiz(lessonId);
+    }
+  };
   
   // If still loading, show loading state
   if (loading) {
@@ -133,7 +156,7 @@ export function LessonContent({
               Back to Lessons
             </Button>
             <Button 
-              onClick={() => onStartQuiz(lessonId)}
+              onClick={handleManualQuizStart}
               disabled={!questions || questions.length === 0}
             >
               {questions && questions.length > 0 ? 'Start Quiz' : 'No Questions Available'}
@@ -189,12 +212,35 @@ export function LessonContent({
     );
   };
 
-  // Show a brief loading state while we auto-start the quiz
+  // Show the lesson content while transitioning to quiz
   return (
-    <div className="min-h-[50vh] md:min-h-[70vh] flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-base md:text-lg text-gray-600">Starting quiz...</p>
+    <div className="min-h-[50vh] md:min-h-[70vh] animate-fade-in p-4">
+      <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-purple-900 mb-4">{title}</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium 
+            ${difficulty === 'easy' ? 'bg-green-100 text-green-800' : 
+              difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' : 
+              'bg-red-100 text-red-800'}`}>
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </span>
+        </div>
+        
+        <div className="prose max-w-none mb-8">
+          <p className="text-gray-700">{description}</p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+          <Button onClick={onBack} variant="outline">
+            Back to Lessons
+          </Button>
+          <Button 
+            onClick={handleManualQuizStart}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            Start Quiz
+          </Button>
+        </div>
       </div>
     </div>
   );
