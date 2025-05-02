@@ -254,17 +254,9 @@ const Lessons = () => {
     const lessonId = activeLessonContent;
     if (!lessonId) return;
     
-    const lesson = lessons.find(l => l.id === lessonId);
-    if (!lesson) return;
-    
-    const subLesson = lesson.subLessons?.find(sl => sl.id === subLessonId);
-    if (subLesson?.questions && subLesson.questions.length > 0) {
-      setActiveQuiz({ lessonId, subLessonId });
-      setActiveLessonContent(null);
-      setCurrentQuestionIndex(0);
-    } else {
-      toast.error('No questions available for this lesson');
-    }
+    setActiveQuiz({ lessonId, subLessonId });
+    setActiveLessonContent(null);
+    setCurrentQuestionIndex(0);
   };
 
   const handleQuizComplete = async (isCorrect: boolean) => {
