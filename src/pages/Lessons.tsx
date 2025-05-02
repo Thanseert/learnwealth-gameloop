@@ -427,7 +427,7 @@ const Lessons = () => {
   }
 
   const activeLesson = lessons.find(l => l.id === activeLessonContent || (activeQuiz && l.id === activeQuiz.lessonId));
-  let currentQuestion: Question | undefined;
+  let currentQuestion; // removed specific type to avoid TypeScript errors
   
   if (activeQuiz && activeLesson) {
     const subLesson = activeLesson.subLessons?.find(sl => sl.id === activeQuiz.subLessonId);
@@ -501,7 +501,6 @@ const Lessons = () => {
               description={activeLesson.description}
               difficulty={activeLesson.difficulty}
               lessonId={activeLesson.id}
-              onStartQuiz={handleStartQuiz}
               onBack={handleLessonClose}
             />
           </div>

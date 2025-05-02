@@ -20,7 +20,6 @@ interface LessonContentProps {
   description: string;
   difficulty: "easy" | "medium" | "hard";
   lessonId: number;
-  onStartQuiz: (subLessonId: number) => void;
   onBack: () => void;
 }
 
@@ -29,66 +28,10 @@ export function LessonContent({
   description,
   difficulty,
   lessonId,
-  onStartQuiz,
   onBack,
 }: LessonContentProps) {
-  const [loading, setLoading] = useState(true);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [quizError, setQuizError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const isMobile = useIsMobile();
-  
-  useEffect(() => {
-    // Define the data fetching function
-    const fetchQuestions = async () => {
-      try {
-        setLoading(true);
-        setQuizError(null);
-        
-        console.log(`Fetching questions for lesson ID: ${lessonId}`);
-        
-        // Fetch questions for this lesson
-        const { data: questionsData, error: questionsError } = await supabase
-          .from('questions')
-          .select('*')
-          .eq('lesson_id', lessonId);
-          
-        if (questionsError) {
-          console.error('Error fetching questions:', questionsError);
-          toast.error('Failed to load lesson content');
-          setQuizError('Failed to load quiz questions. Please try again.');
-          return;
-        }
-        
-        console.log('Fetched questions data:', questionsData);
-        
-        if (questionsData && Array.isArray(questionsData) && questionsData.length > 0) {
-          setQuestions(questionsData);
-        } else {
-          console.log('No questions found for lesson ID:', lessonId);
-          setQuizError('No questions available for this lesson');
-        }
-      } catch (err) {
-        console.error('Error loading lesson content:', err);
-        toast.error('Failed to load lesson content');
-        setQuizError('An unexpected error occurred. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    // Call the fetch function
-    fetchQuestions();
-  }, [lessonId]); // Only dependency is lessonId
-  
-  // Handle quiz start
-  const handleStartQuiz = () => {
-    if (questions && questions.length > 0) {
-      console.log("Starting quiz with lesson ID:", lessonId);
-      onStartQuiz(lessonId);
-    } else {
-      toast.error('No questions available for this quiz');
-    }
-  };
   
   // Mobile Leaderboard Component
   const MobileLeaderboard = () => {
@@ -141,7 +84,7 @@ export function LessonContent({
       <div className="min-h-[50vh] md:min-h-[70vh] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-base md:text-lg text-gray-600">Loading quiz questions...</p>
+          <p className="text-base md:text-lg text-gray-600">Loading content...</p>
         </div>
       </div>
     );
@@ -158,9 +101,6 @@ export function LessonContent({
               'bg-red-100 text-red-800'}`}>
             {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
           </span>
-          {quizError && (
-            <span className="text-red-500 text-sm font-medium">{quizError}</span>
-          )}
         </div>
         
         <div className="prose max-w-none mb-8">
@@ -170,13 +110,6 @@ export function LessonContent({
         <div className="flex flex-col md:flex-row gap-4 justify-between">
           <Button onClick={onBack} variant="outline">
             Back to Lessons
-          </Button>
-          <Button 
-            onClick={handleStartQuiz}
-            disabled={!questions || questions.length === 0}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            {questions && questions.length > 0 ? 'Start Quiz' : 'No Questions Available'}
           </Button>
         </div>
       </div>
